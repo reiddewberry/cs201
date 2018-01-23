@@ -1,14 +1,13 @@
 #include <stdio.h>
 #include "sll.h"
 
-
     struct NODE
         {
         void *data;
         NODE *next;
 	};
 
-    /*The Single Linked List structure*/
+    //The Single Linked List structure
     struct SLL
         {
         NODE *head;
@@ -18,7 +17,7 @@
 	void *(free)(void *, FILE *);
         };
  
-    /*Creates a new Sinle Linked List*/
+    //Creates a new Sinle Linked List
     SLL *newSLL(void (*d)(void *,FILE *),void (*f)(void *))
         {
         SLL *items = malloc(sizeof(SLL));
@@ -104,11 +103,25 @@
 
     //Gives you the value of the Node at a given index
     void *getSLL(SLL *items,int index){
-        
+        assert(index >= 0 && index < items->size);
+	assert(items->size > 0);
+	NODE *tempNode = items->head;
+	if(index = items->size){
+	    tempNode = items->tail;
+	    return tempNode->data;
+	    }
+	int i = 1;
+	for(i=1; i <= index; i++){
+	    tempNode = tempNode->next;
+	    }
+	return tempNode->data;
         }
 
+    void *setSLL(SLL *items,int index,void *value){
+	assert(index >= 0 && index <= items->size);
+	
+	}
 
-    void *setSLL(SLL *items,int index,void *value);
     int sizeSLL(SLL *items);
     void displaySLL(SLL *items,FILE *);
     void displaySLLdebug(SLL *items,FILE *);
