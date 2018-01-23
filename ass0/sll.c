@@ -7,6 +7,14 @@
         NODE *next;
 	};
 
+    NODE *newNODE(void *value,NODE *next){
+	NODE *p = malloc(sizeof(NODE));
+	if(p == 0) { fprintf(ftderr,"out of memory\n"); exit(1); }
+	p->value = value;
+	p->next = next;
+	return p;
+	}
+
     //The Single Linked List structure
     struct SLL
         {
@@ -49,10 +57,10 @@
 	
 	else{
 	    NODE *tempnode = malloc(sizeof(NODE));
-	    int i = 1;
+	    int i = 0;
 	    new->next = items->head;
 	    tempnode->next = items->head;
-	    for (i=1; i <= index; i++){
+	    for (i=0; i < index; i++){
 	        new->next = new->next->next;
 		if(i < index){
 		    tempnode->next = tempnode->next->next;
@@ -94,8 +102,8 @@
     
     //Combines 2 lists  items, index, value
     void unionSLL(SLL *recipient,SLL *donor){
-	int i = 1;
-	for(i=1; i <= donor->size; i++){
+	int i = 0;
+	for(i=0; i < donor->size; i++){
 	    insertSLL(recipient, recipient->size, donor->head->data);
 	    removeSLL(donor, 0);
 	    }
@@ -110,20 +118,47 @@
 	    tempNode = items->tail;
 	    return tempNode->data;
 	    }
-	int i = 1;
-	for(i=1; i <= index; i++){
+	int i = 0;
+	for(i=0; i < index; i++){
 	    tempNode = tempNode->next;
 	    }
 	return tempNode->data;
         }
 
+    //Finds, gives, and updates the value for the Node at the given index
     void *setSLL(SLL *items,int index,void *value){
 	assert(index >= 0 && index <= items->size);
+	if(index == items->size){
+	    insertSLL(items, index, value);
+	    return 0;
+	    }
+	int i = 0;
+	NODE *tempNode = items->head
+	for(i=0; i < index; i++){
+	    tempNode = tempNode->next
+	    }
+	void *returnVal = tempNode->data;
+	tempNode->data = value;
+	return returnVal; 
+	}
+
+    //returns the size of the SLL
+    int sizeSLL(SLL *items){
+	return items->size;
+	}
+
+    //displays the SLL as values in a list e.g. {5,6,2,9,1} or {}
+    void displaySLL(SLL *items,FILE *FP){
+	if(items-size == 0){
+	    
+	    }
 	
 	}
 
-    int sizeSLL(SLL *items);
-    void displaySLL(SLL *items,FILE *);
-    void displaySLLdebug(SLL *items,FILE *);
+    //displays a SLL with more e.g.(SLL:  3,1,2) "head->{3,1,2},tail->{2}"
+    void displaySLLdebug(SLL *items,FILE *FP);
+
+    //walks through the SLL and frees nodes with the freeing function
     void freeSLL(SLL *items);
+
 
