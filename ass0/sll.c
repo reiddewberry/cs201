@@ -43,9 +43,12 @@
         assert(index >= 0 && index <= items->size);
         NODE *new = malloc(sizeof(NODE));
 	new->data = value;
-	if (item->size == 0){
+	if (index == 0){
+	    new->next = items->head;
             items->head = new;
-	    items->tail = new;
+	    if(items->size == 0){
+		items->tail = new;
+		}
  	    items->size += 1;		
             }
 
@@ -56,21 +59,19 @@
 	    }
 	
 	else{
-	    NODE *tempnode = malloc(sizeof(NODE));
-	    int i = 0;
+	    NODE *tempnode = items->head;
 	    new->next = items->head;
-	    tempnode->next = items->head;
-	    for (i=0; i < index-1; i++){
+	    int i = 0;
+	    for (i=0; i < index; i++){
 	        new->next = new->next->next;
-		if(i < index-2){
-		    tempnode->next = tempnode->next->next;
+		if(i < index-1){
+		    tempnode = tempnode->next;
 		    }
 		}
-   	    tempnode->next->next = new;
-	    free(tempnode);
+   	    tempnode->next = new;
 	    items->size += 1;
 	    }
-        }    
+        }
 
     //Removes a certain node from the list
     void *removeSLL(SLL *items,int index){
