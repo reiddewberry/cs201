@@ -60,9 +60,9 @@
 	    int i = 0;
 	    new->next = items->head;
 	    tempnode->next = items->head;
-	    for (i=0; i < index; i++){
+	    for (i=0; i < index-1; i++){
 	        new->next = new->next->next;
-		if(i < index){
+		if(i < index-2){
 		    tempnode->next = tempnode->next->next;
 		    }
 		}
