@@ -16,9 +16,6 @@ test-integer.o :	test-integer.c integer.h
 test : test-integer
 		./test-integer
 
-testsll : test
-		./test
-
 valgrind : test-integer
 		valgrind ./test-integer
 

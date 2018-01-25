@@ -22,11 +22,11 @@
 	NODE *tail;
 	int size;
 	void *(display)(void *,FILE *); 
-	void *(free)(void *, FILE *);
+	void *(free)(void *);
         };
  
     //Creates a new Sinle Linked List
-    SLL *newSLL(void (*d)(void *,FILE *),void (*f)(void *))
+    SLL *newSLL(void (*d)(void *value,FILE *FP),void (*f)(void *value))
         {
         SLL *items = malloc(sizeof(SLL));
         assert(items != 0);
@@ -102,11 +102,10 @@
     
     //Combines 2 lists  items, index, value
     void unionSLL(SLL *recipient,SLL *donor){
-	int i = 0;
-	for(i=0; i < donor->size; i++){
-	    insertSLL(recipient, recipient->size, donor->head->data);
-	    removeSLL(donor, 0);
-	    }
+	recipient->tail->next = donor->head;
+	donor->head = 0;
+	donor->tail = 0;
+	donor->size = 0;
 	}
 
     //Gives you the value of the Node at a given index
@@ -149,16 +148,44 @@
 
     //displays the SLL as values in a list e.g. {5,6,2,9,1} or {}
     void displaySLL(SLL *items,FILE *FP){
-	if(items-size == 0){
-	    
+	fprintf(FP,"{");
+	NODE *printNode = items->head;
+	while(printNode != 0){
+            items->display(printNode->data,FP);
+	    printNode = printNode->next;
+ 	    if(printNode != 0){
+	        fprintf(FP,",");
+	        }
 	    }
-	
+	fprintf(FP,"}");
 	}
 
     //displays a SLL with more e.g.(SLL:  3,1,2) "head->{3,1,2},tail->{2}"
-    void displaySLLdebug(SLL *items,FILE *FP);
+    void displaySLLdebug(SLL *items,FILE *FP){
+	fprintf(FP,"head->");	
+	displaySLL(items,FP);
+
+	NODE *tailNode = items->head;
+	fprint(FP,",tail->{");
+	if(tailNode != 0){
+	    items->display(items->tail,FP)
+	    fprintf(FP,"}")
+	    }
+	else{fprintf(FP,"{}")}
+	}
 
     //walks through the SLL and frees nodes with the freeing function
-    void freeSLL(SLL *items);
-
-
+    void freeSLL(SLL *items){
+	NODE *freeNode = items->head;
+	NODE *nextNode = freeNode->next;
+	while(freeNode != 0){
+	    if(items->free != 0){
+		items->free(freeNode->data);
+		}
+	    free(freeNode)
+	    freeNode = nextNode;
+	    if(nextNode != 0){
+	        nextNode = nextNode->next;
+		}
+	    }
+	}
