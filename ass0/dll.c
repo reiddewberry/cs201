@@ -7,7 +7,14 @@
 	NODE *next;
 	};
 
-    struct DLL;
+    struct DLL
+	{
+	NODE *head;
+	NODE *tail;
+	int size;
+	void *(display)(void *,FILE *);
+	void *(free)(void *);
+	};
 
 
     DLL *newDLL(void (*d)(void *,FILE *),void (*f)(void *))
@@ -22,13 +29,16 @@
         return items;
         }
 
-    extern void insertDLL(DLL *items,int index,void *value);
-    extern void *removeDLL(DLL *items,int index);
-    extern void unionDLL(DLL *recipient,DLL *donor);
-    extern void *getDLL(DLL *items,int index);
-    extern void *setDLL(DLL *items,int index,void *value);
-    extern int sizeDLL(DLL *items);
-    extern void displayDLL(DLL *items,FILE *);
-    extern void displayDLLdebug(DLL *items,FILE *);
-    extern void freeDLL(DLL *items);
+    void insertDLL(DLL *items,int index,void *value){
+	
+	}
+	
+    void *removeDLL(DLL *items,int index);
+    void unionDLL(DLL *recipient,DLL *donor);
+    void *getDLL(DLL *items,int index);
+    void *setDLL(DLL *items,int index,void *value);
+    int sizeDLL(DLL *items);
+    void displayDLL(DLL *items,FILE *);
+    void displayDLLdebug(DLL *items,FILE *);
+    void freeDLL(DLL *items);
 
