@@ -19,15 +19,34 @@
 	}
  
     void push(STACK *items,void *value){
-	insertSLL(items->list, 0, value); 
+	insertSLL(items->list,0,value); 
 	}
     
     void *pop(STACK *items){
-	removeSLL();
+	assert(items->list->size > 0);
+	return removeSLL(items,0);
 	}
     
-    void *peekSTACK(STACK *items);
-    int sizeSTACK(STACK *items);
-    void displaySTACK(STACK *items,FILE *);
-    void displaySTACKdebug(STACK *items,FILE *);
-    void freeSTACK(STACK *items);
+    void *peekSTACK(STACK *items){
+	assert(items->list->size);
+	return getSLL(items,0);
+	}
+
+    int sizeSTACK(STACK *items){
+	return items->list->size;
+	}
+
+    void displaySTACK(STACK *items,FILE *FP){
+	fprintf(FP,"|");
+	
+	fprintf(FP,"|");
+	}
+
+    void displaySTACKdebug(STACK *items,FILE *FP){
+	displaySLLdebug(items->list,FP);
+	}
+
+    void freeSTACK(STACK *items){
+	freeSLL(items->list);
+	free(items);
+	}
