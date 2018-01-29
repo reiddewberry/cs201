@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 #include "sll.h"
 
     typedef struct node NODE;
@@ -11,7 +13,7 @@
 
     NODE *newNODE(void *value,NODE *next){
         NODE *p = malloc(sizeof(NODE));
-        if(p == 0) { fprintf(ftderr,"out of memory\n"); exit(1); }
+        assert(p != 0);
         p->value = value;
         p->next = next;
         return p;

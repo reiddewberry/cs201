@@ -1,4 +1,4 @@
-fndef __DLL_INCLUDED__
+    #ifndef __DLL_INCLUDED__
     #define __DLL_INCLUDED__
 
     #include <stdio.h>

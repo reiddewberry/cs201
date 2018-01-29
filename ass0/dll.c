@@ -1,4 +1,7 @@
-#include <stdio.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <assert.h>
+    #include "dll.h"
 
     typedef struct node NODE;
 
