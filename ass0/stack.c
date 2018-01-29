@@ -24,12 +24,12 @@
     
     void *pop(STACK *items){
 	assert(items->list->size > 0);
-	return removeSLL(items,0);
+	return removeSLL(items->list,0);
 	}
     
     void *peekSTACK(STACK *items){
 	assert(items->list->size);
-	return getSLL(items,0);
+	return getSLL(items->list,0);
 	}
 
     int sizeSTACK(STACK *items){
@@ -38,7 +38,11 @@
 
     void displaySTACK(STACK *items,FILE *FP){
 	fprintf(FP,"|");
-	
+	int i = 0;
+	for(i=0; i < items->list->size; i++){
+	    fprintf(FP,getSLL(items->list,i));
+	    fprintf(FP,",");
+	    }
 	fprintf(FP,"|");
 	}
 

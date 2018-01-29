@@ -77,22 +77,30 @@
     void *removeSLL(SLL *items,int index){
 	assert(items->size > 0 && index >= 0 && index < items->size);
 	NODE *tempNode = items->head;
-	int i = 1;
-	for(i=1; i < index; i++){
-	    tempNode = tempNode->next;
+	NODE *removeNode = items->head;
+	int i = 0;
+	for(i=0; i < index; i++){
+	    removeNode = removeNode->next;
+	    if(i < index-1){
+		tempNode = tempNode->next;
+		}
 	    }
 	
-	if(tempNode == items->head){
-	    void *returnVal = tempNode->data;
-	    free(tempNode);
-	    items->head = 0;
-	    items->tail = 0;
+	if(removeNode == items->head){
+	    void *removeVal = removeNode->data;
+	    if(items->size == 1){
+		items->head = 0;
+	    	items->tail = 0;
+	    	items->size -= 1;
+		return removeVal;
+		}
+	    items->head = removeNode->next
+	    free(removeNode);
 	    items->size -= 1;
-	    return returnVal;
+	    return removeVal;
 	    }
 
-	NODE *removeNode = tempNode->next;
-	void *returnVal = removeNode->data;
+	void *removeVal = removeNode->data;
 	if(removeNode == items->tail){
 	    items->tail = tempNode;
 	    }
