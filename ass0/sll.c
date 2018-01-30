@@ -115,8 +115,13 @@
 
     //Combines 2 lists  items, index, value
     void unionSLL(SLL *recipient,SLL *donor){
-        recipient->tail->next = donor->head;
         if(donor->tail != 0){
+            if(recipient->head == 0){
+                recipient->head = donor->head;
+                }
+            else{
+                recipient->tail->next = donor->head;
+                }
             recipient->tail = donor->tail;
             }
         recipient->size += donor->size;
