@@ -9,6 +9,7 @@
         struct node *next;
         }NODE;
 
+/*
     NODE *newNODE(void *value,NODE *next){
         NODE *p = malloc(sizeof(NODE));
         assert(p != 0);
@@ -16,6 +17,7 @@
         p->next = next;
         return p;
         }
+*/
 
     //The Single Linked List structure
     typedef struct sll
@@ -114,7 +116,9 @@
     //Combines 2 lists  items, index, value
     void unionSLL(SLL *recipient,SLL *donor){
         recipient->tail->next = donor->head;
-        recipient->tail = donor->tail;
+        if(donor->tail != 0){
+            recipient->tail = donor->tail;
+            }
         recipient->size += donor->size;
         donor->head = 0;
         donor->tail = 0;

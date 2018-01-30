@@ -124,8 +124,10 @@
     //combines 2 DLLs together
     void unionDLL(DLL *recipient,DLL *donor){
         recipient->tail->next = donor->head;
-        donor->head->prev = recipient->tail;
-        recipient->tail = donor->tail;
+        if(donor->tail != 0){
+            donor->head->prev = recipient->tail;
+            recipient->tail = donor->tail;
+            }
         recipient->size += donor->size;
         donor->head = 0;
         donor->tail = 0;

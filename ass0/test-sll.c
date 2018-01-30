@@ -8,6 +8,25 @@ main(void)
     {
     srandom(1);
     SLL *p = newSLL(displayINTEGER,freeINTEGER);
+
+    /*FILE *fp;
+    fp = fopen("test_file.txt", "w");
+    int i=0;
+    for(i=0; i<1000; i++){
+        int j = i/2;
+        insertSLL(p,j,newINTEGER(i));
+        if(i < 20){
+            displaySLL(p,fp);
+            fprintf(fp,"\n");
+            }
+        }
+
+    for(int i=0; i<1000; i++){
+        removeSLL(p,0);
+        }
+    displaySLL(p,fp);
+    fclose(fp);
+*/
     insertSLL(p,0,newINTEGER(3));
     insertSLL(p,sizeSLL(p),newINTEGER(2));
     displaySLL(p,stdout);
@@ -38,4 +57,5 @@ main(void)
     freeSLL(p);
     freeSLL(q);
     return 0;
+    freeSLL(p);
     }
