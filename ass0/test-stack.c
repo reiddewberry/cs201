@@ -7,34 +7,28 @@
 int
 main(void)
     {
-    srandom(1);
     STACK *p = newSTACK(displayINTEGER,freeINTEGER);
-    push(p,newINTEGER(3));
-    push(p,newINTEGER(4));
-    push(p,newINTEGER(2));
-    displaySTACK(p,stdout);
-    printf("\n");
-    void *value = pop(p);
-    displayINTEGER(value,stdout);
-    printf("\n");
-    freeINTEGER(value);
-    displaySTACK(p,stdout);
-    printf("\n");
-    displaySTACKdebug(p,stdout);
-    printf("\n");
-    value = pop(p);
-    displayINTEGER(value,stdout);
-    printf("\n");
-    freeINTEGER(value);
-    displaySTACK(p,stdout);
-    printf("\n");
-    displaySTACKdebug(p,stdout);
-    printf("\n");
-    freeINTEGER(pop(p));
-    displaySTACK(p,stdout);
-    printf("\n");
-    displaySTACKdebug(p,stdout);
-    printf("\n");
+    FILE *fp;
+    fp = fopen("stack_test_output.txt", "w");
+
+    int i=0;
+    while(i < 1000000)
+    {
+        push(p,newINTEGER(1));
+        i++;
+    }
+    INTEGER *num;
+    i=0;
+    while(i < 1000000)
+    {
+        num = pop(p);
+        displayINTEGER(num, fp);
+        freeINTEGER(num);
+        fprintf(fp,"\n");
+        i++;
+    }
+    displaySTACK(p, fp);
+    fclose(fp);
     freeSTACK(p);
     return 0;
     }

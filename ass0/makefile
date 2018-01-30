@@ -2,9 +2,9 @@ BJS = integer.o real.o string.o sll.o dll.o stack.o queue.o
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : clearscreen test-sll test-dll test-stack test-queue
+all : clears test-sll test-dll test-stack test-queue
 
-clearscreen :
+clears :
 	clear
 
 test-sll : test-sll.o integer.o sll.o
@@ -81,4 +81,4 @@ test : all
 	echo
 
 clean    :
-	rm -f $(OBJS) test-*.o test-stack test-queue test-sll test-dll
+	rm -f $(OBJS) test-*.o *.o test-stack test-queue test-sll test-dll
