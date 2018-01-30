@@ -1,33 +1,31 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include "sll.h"
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <assert.h>
+    #include "sll.h"
 
-    typedef struct node NODE;
-
-    struct NODE
+    typedef struct node
         {
         void *data;
-        NODE *next;
-        };
+        struct node *next;
+        }NODE;
 
     NODE *newNODE(void *value,NODE *next){
         NODE *p = malloc(sizeof(NODE));
         assert(p != 0);
-        p->value = value;
+        p->data = value;
         p->next = next;
         return p;
         }
 
     //The Single Linked List structure
-    struct SLL
+    typedef struct sll
         {
         NODE *head;
         NODE *tail;
         int size;
-        void *(display)(void *,FILE *); 
-        void *(free)(void *);
-        };
+        void (*display)(void *,FILE *);
+        void (*free)(void *);
+        }SLL;
 
     //Creates a new Sinle Linked List
     SLL *newSLL(void (*d)(void *value,FILE *FP),void (*f)(void *value))
@@ -58,6 +56,7 @@
         else if(index == items->size){
             items->tail->next = new;
             items->tail = new;
+            new->next = 0;
             items->size += 1;
             }
         else{
@@ -96,7 +95,7 @@
                 free(removeNode);
                 return removeVal;
                 }
-            items->head = removeNode->next
+            items->head = removeNode->next;
             free(removeNode);
             items->size -= 1;
             return removeVal;
@@ -109,12 +108,13 @@
         else{tempNode->next = removeNode->next;}
         free(removeNode);
         items->size -= 1;
-        return returnVal;
+        return removeVal;
         }
 
     //Combines 2 lists  items, index, value
     void unionSLL(SLL *recipient,SLL *donor){
         recipient->tail->next = donor->head;
+        recipient->tail = donor->tail;
         recipient->size += donor->size;
         donor->head = 0;
         donor->tail = 0;
@@ -124,7 +124,7 @@
     //Gives you the value of the Node at a given index
     void *getSLL(SLL *items,int index){
         assert(index >= 0 && index < items->size);
-        if(index = items->size-1){
+        if(index == items->size-1){
             return items->tail->data;
             }
         NODE *tempNode = items->head;
@@ -148,9 +148,9 @@
             items->tail->data = value;
             return returnVal;
             }
-        NODE *tempNode = items->head
+        NODE *tempNode = items->head;
         for(i=0; i < index; i++){
-            tempNode = tempNode->next
+            tempNode = tempNode->next;
             }
         void *returnVal = tempNode->data;
         tempNode->data = value;
@@ -181,26 +181,28 @@
         fprintf(FP,"head->");
         displaySLL(items,FP);
         NODE *tailNode = items->head;
-        fprint(FP,",tail->{");
+        fprintf(FP,",tail->");
         if(tailNode != 0){
-            items->display(items->tail->data,FP)
-            fprintf(FP,"}")
+            fprintf(FP,"{");
+            items->display(items->tail->data,FP);
+            fprintf(FP,"}");
             }
-        else{fprintf(FP,"{}")}
+        else{fprintf(FP,"{}");}
         }
 
     //walks through the SLL and frees nodes with the freeing function
     void freeSLL(SLL *items){
         NODE *freeNode = items->head;
-        NODE *nextNode = freeNode->next;
+        NODE *nextNode = items->head;
         while(freeNode != 0){
             if(items->free != 0){
                 items->free(freeNode->data);
                 }
-            free(freeNode)
-            freeNode = nextNode;
             if(nextNode != 0){
                 nextNode = nextNode->next;
                 }
+            free(freeNode);
+            freeNode = nextNode;
             }
+        free(items);
         }

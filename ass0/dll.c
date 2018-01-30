@@ -3,23 +3,21 @@
     #include <assert.h>
     #include "dll.h"
 
-    typedef struct node NODE;
-
-    struct NODE
+    typedef struct node
         {
         void *data;
-        NODE *prev;
-        NODE *next;
-        };
+        struct node *prev;
+        struct node *next;
+        }NODE;
 
-    struct DLL
+    typedef struct dll
         {
         NODE *head;
         NODE *tail;
         int size;
-        void *(display)(void *,FILE *);
-        void *(free)(void *);
-        };
+        void (*display)(void *,FILE *);
+        void (*free)(void *);
+        }DLL;
 
 
     DLL *newDLL(void (*d)(void *,FILE *),void (*f)(void *))
@@ -40,7 +38,14 @@
         NODE *newNode = malloc(sizeof(NODE));
         newNode->data = value;
         if(index == 0){
+            newNode->prev = 0;
             newNode->next = items->head;
+            if(items->size == 0){
+                items->head = newNode;
+                items->tail = newNode;
+                items->size += 1;
+                return;
+                }
             items->head->prev = newNode;
             items->head = newNode;
             items->size += 1;
@@ -49,6 +54,7 @@
             items->tail->next = newNode;
             newNode->prev = items->tail;
             items->tail = newNode;
+            newNode->next = 0;
             items->size += 1;
             }
         else if(index < items->size/2){
@@ -58,7 +64,7 @@
                 tempNode = tempNode->next;
                 }
             newNode->next = tempNode;
-            newNode->prev = tempNode->prev
+            newNode->prev = tempNode->prev;
             tempNode->prev->next = newNode;
             tempNode->prev = newNode;
             items->size += 1;
@@ -70,7 +76,7 @@
                 tempNode = tempNode->prev;
                 } 
             newNode->next = tempNode;
-            newNode->prev = tempNode->prev
+            newNode->prev = tempNode->prev;
             tempNode->prev->next = newNode;
             tempNode->prev = newNode;
             items->size += 1;
@@ -89,24 +95,25 @@
             void *removeVal = removeNode->data;
             if(items->size == 1){
                 items->head = 0;
-                items->tail = 0
+                items->tail = 0;
                 items->size -= 1;
-                free removeNode;
+                free(removeNode);
                 return removeVal;
                 }
             items->head = removeNode->next;
             items->head->prev = 0;
+            items->size -= 1;
             free(removeNode);
             return removeVal;
             }
         void *removeVal = removeNode->data;
         if(removeNode == items->tail){
             items->tail = removeNode->prev;
-            items->tail->next = 0
+            items->tail->next = 0;
             }
         else{
             NODE *prevNode = removeNode->prev;
-            prevNove->next = removeNode->next;
+            prevNode->next = removeNode->next;
             removeNode->next->prev = prevNode;
             }
         free(removeNode);
@@ -118,6 +125,7 @@
     void unionDLL(DLL *recipient,DLL *donor){
         recipient->tail->next = donor->head;
         donor->head->prev = recipient->tail;
+        recipient->tail = donor->tail;
         recipient->size += donor->size;
         donor->head = 0;
         donor->tail = 0;
@@ -190,9 +198,11 @@
         displayDLL(items, FP);
         fprintf(FP,",");
         NODE *tailNode = items->tail;
-        fprintf(FP,"tail->")
+        fprintf(FP,"tail->");
         if(tailNode != 0){
-            displayDLL(items, FP);
+            fprintf(FP,"{{");
+            items->display(items->tail->data,FP);
+            fprintf(FP,"}}");
             }
         else{
             fprintf(FP,"{{}}");
@@ -201,15 +211,14 @@
     //free every node and value in the DLL using the freeing function passed in
     void freeDLL(DLL *items){
         NODE *freeNode = items->head;
-        NODE *nextNode = freeNode->next;
+        NODE *nextNode = items->head;
         while(freeNode != 0){
             if(items->free != 0){
                 items->free(freeNode->data);
                 }
+            nextNode = nextNode->next;
             free(freeNode);
             freeNode = nextNode;
-            if(nextNode != 0){
-                nextNode = nextNode->next;
-                }
             }
+        free(items);
         }

@@ -2,30 +2,33 @@ BJS = integer.o real.o string.o sll.o dll.o stack.o queue.o
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : test-sll test-dll test-stack test-queue
+all : clearscreen test-sll test-dll test-stack test-queue
+
+clearscreen :
+	clear
 
 test-sll : test-sll.o integer.o sll.o
 	gcc $(LOPTS) test-sll.o integer.o sll.o  -o test-sll
 
-test-dll : test-dll.o real.o dll.o
-	gcc $(LOPTS) test-dll.o real.o dll.o -o test-dll
+test-dll : test-dll.o integer.o dll.o
+	gcc $(LOPTS) test-dll.o integer.o dll.o -o test-dll
 
-test-stack : test-stack.o string.o dll.o stack.o
-	gcc $(LOPTS) test-stack.o string.o dll.o stack.o -o test-stack
+test-stack : test-stack.o integer.o dll.o stack.o
+	gcc $(LOPTS) test-stack.o integer.o dll.o stack.o -o test-stack
 
 test-queue : test-queue.o integer.o sll.o queue.o
 	gcc $(LOPTS) test-queue.o integer.o sll.o queue.o -o test-queue
 
-test-sll.c : test-sll.c sll.h integer.h
+test-sll.o : test-sll.c sll.h integer.h
 	gcc $(OOPTS) test-sll.c
 
-test-dll.c : test-dll.c dll.h real.h
+test-dll.o : test-dll.c dll.h integer.h
 	gcc $(OOPTS) test-dll.c
 
-test-stack.c : test-stack.c stack.h string.h
+test-stack.o : test-stack.c stack.h integer.h
 	gcc $(OOPTS) test-stack.c
 
-test-queue.c : test-queue.c queue.h integer.h
+test-queue.o : test-queue.c queue.h integer.h
 	gcc $(OOPTS) test-queue.c
 
 stack.o : stack.c stack.h

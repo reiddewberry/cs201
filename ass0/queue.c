@@ -2,16 +2,14 @@
     #include <stdlib.h>
     #include <assert.h>
     #include "queue.h"
-    #include "dll.h"
+    #include "sll.h"
 
-    typedef struct queue QUEUE;
-
-    struct QUEUE
+    typedef struct queue
         {
         SLL *list;
-        void *(display)(void *,FILE *);
-        void *(free)(void *);
-        };
+        void (*display)(void *,FILE *);
+        void (*free)(void *);
+        }QUEUE;
 
     QUEUE *newQUEUE(void (*d)(void *,FILE *),void (*f)(void *)){
         QUEUE *items = malloc(sizeof(QUEUE));
@@ -23,33 +21,33 @@
         }
 
     void enqueue(QUEUE *items,void *value){
-        insertSLL(items->list,items->list->size,value);
+        insertSLL(items->list,sizeSLL(items->list),value);
         }
 
     void *dequeue(QUEUE *items){
-        assert(items->list->size > 0);
+        assert(sizeSLL(items->list) > 0);
         return removeSLL(items->list,0);
         }
 
     void *peekQUEUE(QUEUE *items){
-        assert(items->list->size > 0);
+        assert(sizeSLL(items->list) > 0);
         return getSLL(items->list,0);
         }
 
     int sizeQUEUE(QUEUE *items){
-        return items->list->size;
+        return sizeSLL(items->list);
         }
 
     void displayQUEUE(QUEUE *items,FILE *FP){
-        fprintf(FP,"<")
+        fprintf(FP,"<");
         int i = 0;
-        for(i=0; i < items->list->size; i++){
-            fprintf(FP,getSLL(items->list,i));
-            if(i < items->list->size-1){
-                fprintf(FP,",")
+        for(i=0; i < sizeSLL(items->list); i++){
+            items->display(getSLL(items->list,i),FP);
+            if(i < sizeSLL(items->list)-1){
+                fprintf(FP,",");
                 }
             }
-        fprintf(FP,">")
+        fprintf(FP,">");
         }
 
     void displayQUEUEdebug(QUEUE *items,FILE *FP){
