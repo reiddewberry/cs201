@@ -37,6 +37,8 @@
         assert(index >= 0 && index <= items->size);
         NODE *newNode = malloc(sizeof(NODE));
         newNode->data = value;
+        newNode->prev = 0;
+        newNode->next = 0;
         if(index == 0){
             newNode->prev = 0;
             newNode->next = items->head;
@@ -49,47 +51,59 @@
             items->head->prev = newNode;
             items->head = newNode;
             items->size += 1;
+            return;
             }
         else if(index == items->size){
             items->tail->next = newNode;
             newNode->prev = items->tail;
             items->tail = newNode;
-            newNode->next = 0;
             items->size += 1;
-            }
-        else if(index < items->size/2){
-            int i = 0;
-            NODE *tempNode = items->head;
-            for(i=0; i < index; i++){
-                tempNode = tempNode->next;
-                }
-            newNode->next = tempNode;
-            newNode->prev = tempNode->prev;
-            tempNode->prev->next = newNode;
-            tempNode->prev = newNode;
-            items->size += 1;
+            return;
             }
         else{
-            int i = items->size;
-            NODE *tempNode = items->tail;
-            for(i=items->size; i > index; i++){
-                tempNode = tempNode->prev;
-                } 
-            newNode->next = tempNode;
-            newNode->prev = tempNode->prev;
-            tempNode->prev->next = newNode;
-            tempNode->prev = newNode;
-            items->size += 1;
+            if(index < items->size/2){
+                int i = 0;
+                NODE *tempNode = items->head;
+                for(i=0; i < index; i++){
+                    tempNode = tempNode->next;
+                    }
+                newNode->next = tempNode;
+                newNode->prev = tempNode->prev;
+                tempNode->prev->next = newNode;
+                tempNode->prev = newNode;
+                items->size += 1;
+                }
+            else{
+                int i = items->size-1;
+                NODE *tempNode = items->tail;
+                for(i=items->size-1; i > index; i--){
+                    tempNode = tempNode->prev;
+                    }
+                newNode->next = tempNode;
+                newNode->prev = tempNode->prev;
+                tempNode->prev->next = newNode;
+                tempNode->prev = newNode;
+                items->size += 1;
+                }
             }
         }
 
     //removes a certain node in the DLL and returns the value
     void *removeDLL(DLL *items,int index){
-        assert(items->size > 0 && index >= 0 && index < items->size);   
+        assert(items->size > 0 && index >= 0 && index < items->size);
         NODE *removeNode = items->head;
-        int i = 0;
-        for(i=0; i < index; i++){
-            removeNode = removeNode->next;
+        if(index < items->size/2){
+            int i = 0;
+            for(i=0; i < index; i++){
+                removeNode = removeNode->next;
+                }
+            }
+        else{
+            removeNode = items->tail;
+            int i = items->size-1;
+            for(i=items->size-1; i > index; i--){
+                removeNode = removeNode->prev;
+                }
             }
         if(removeNode == items->head){
             void *removeVal = removeNode->data;
@@ -145,12 +159,22 @@
         if(index == items->size-1){
             return items->tail->data;
             }
-        NODE *tempNode = items->head;
-        int i = 0;
-        for(i=0; i < index; i++){
-            tempNode = tempNode->next;
+        if(index < items->size/2){
+            NODE *tempNode = items->head;
+            int i = 0;
+            for(i=0; i < index; i++){
+                tempNode = tempNode->next;
+                }
+            return tempNode->data;
             }
-        return tempNode->data;
+        else{
+            NODE *tempNode = items->tail;
+            int i = items->size-1;
+            for(i=items->size-1; i > index; i--){
+                tempNode = tempNode->prev;
+                }
+            return tempNode->data;
+            }
         }
 
     //sets the value and returns what used to be there. or create a new node at the end
@@ -170,14 +194,26 @@
             insertDLL(items, index, value);
             return 0;
             }
-        NODE *tempNode = items->head;
-        int i = 0;
-        for(i=0; i < index; i++){
-            tempNode = tempNode->next;
+        if(index < items->size/2){
+            NODE *tempNode = items->head;
+            int i = 0;
+            for(i=0; i < index; i++){
+                tempNode = tempNode->next;
+                }
+            void *returnVal = tempNode->data;
+            tempNode->data = value;
+            return returnVal;
             }
-        void *returnVal = tempNode->data;
-        tempNode->data = value;
-        return returnVal;
+        else{
+            NODE *tempNode = items->tail;
+            int i = items->size-1;
+            for(i=items->size-1; i > index; i--){
+                tempNode = tempNode->prev;
+                }
+            void *returnVal = tempNode->data;
+            tempNode->data = value;
+            return returnVal;
+            }
         }
 
     //returns the size of the DLL

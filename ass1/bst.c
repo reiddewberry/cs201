@@ -1,4 +1,6 @@
     #include <stdio.h>
+    #include "bst.h"
+    #include "queue.h"
 
     typedef struct bstnode{
         void *data;
@@ -17,32 +19,45 @@
         return bstNode;
         }
 
-    void *getBSTNODE(BSTNODE *n){
-        
+    void *getBSTNODE(BSTNODE *node){
+        return node->data;
         }
 
-    void setBSTNODE(BSTNODE *n,void *value){
+    void setBSTNODE(BSTNODE *node,void *value){
+        void *returnVal = node->data;
+        node->data = value;
+        return returnVal;
         }
 
-    BSTNODE *getBSTNODEleft(BSTNODE *n){
+    BSTNODE *getBSTNODEleft(BSTNODE *node){
+        return node->left;
         }
 
-    void setBSTNODEleft(BSTNODE *n,BSTNODE *replacement){
+    void setBSTNODEleft(BSTNODE *node,BSTNODE *replacement){
+        node->left = replacement
         }
 
-    BSTNODE *getBSTNODEright(BSTNODE *n){
+    BSTNODE *getBSTNODEright(BSTNODE *node){
+        return node->right;
         }
 
-    void setBSTNODEright(BSTNODE *n,BSTNODE *replacement){
+    void setBSTNODEright(BSTNODE *node,BSTNODE *replacement){
+        node->right = replacement;
         }
 
-    BSTNODE *getBSTNODEparent(BSTNODE *n){
+    BSTNODE *getBSTNODEparent(BSTNODE *node){
+        return node->parent;
         }
 
-    void setBSTNODEparent(BSTNODE *n,BSTNODE *replacement){
+    void setBSTNODEparent(BSTNODE *node,BSTNODE *replacement){
+        node->parent = replacement;
         }
 
-    void freeBSTNODE(BSTNODE *n,void (*free)(void *)){
+    void freeBSTNODE(BSTNODE *node,void (*freefunct)(void *value)){
+        if(free != 0){
+            freefunct(node->data);
+            }
+        free(node);
         }
 
 

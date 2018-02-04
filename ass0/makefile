@@ -2,7 +2,7 @@ BJS = integer.o real.o string.o sll.o dll.o stack.o queue.o
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : clears test-sll test-dll test-stack test-queue
+all : clears test-sll dll-0-14
 
 clears :
 	clear
@@ -12,6 +12,9 @@ test-sll : test-sll.o integer.o sll.o
 
 test-dll : test-dll.o integer.o dll.o
 	gcc $(LOPTS) test-dll.o integer.o dll.o -o test-dll
+
+dll-0-14 : dll-0-14.o integer.o dll.o
+	gcc $(LOPTS) dll-0-14.o integer.o dll.o -o dll-0-14
 
 test-stack : test-stack.o integer.o dll.o stack.o
 	gcc $(LOPTS) test-stack.o integer.o dll.o stack.o -o test-stack
@@ -56,15 +59,6 @@ valgrind  : all
 	echo testing singly-linked list
 	valgrind ./test-sll
 	echo
-	echo testing doubly-linked list
-	valgrind ./test-dll
-	echo
-	echo testing stack
-	valgrind ./test-stack
-	echo
-	echo testing queue
-	valgrind ./test-queue
-	echo
 
 test : all
 	echo testing singly-linked list
@@ -81,4 +75,4 @@ test : all
 	echo
 
 clean    :
-	rm -f $(OBJS) test-*.o *.o test-stack test-queue test-sll test-dll
+	rm -f $(OBJS) test-*.o *.o vgcore.* test-stack test-queue test-sll test-dll

@@ -47,6 +47,7 @@
         assert(index >= 0 && index <= items->size);
         NODE *new = malloc(sizeof(NODE));
         new->data = value;
+        new->next = 0;
         if (index == 0){
             new->next = items->head;
             items->head = new;
@@ -54,12 +55,14 @@
                 items->tail = new;
                 }
             items->size += 1;
+            return;
             }
         else if(index == items->size){
             items->tail->next = new;
             items->tail = new;
             new->next = 0;
             items->size += 1;
+            return;
             }
         else{
             NODE *tempnode = items->head;
@@ -107,7 +110,9 @@
             items->tail = tempNode;
             tempNode->next = 0;
             }
-        else{tempNode->next = removeNode->next;}
+        else{
+            tempNode->next = removeNode->next;
+            }
         free(removeNode);
         items->size -= 1;
         return removeVal;
@@ -116,11 +121,11 @@
     //Combines 2 lists  items, index, value
     void unionSLL(SLL *recipient,SLL *donor){
         if(donor->tail != 0){
-            if(recipient->head == 0){
-                recipient->head = donor->head;
+            if(recipient->head != 0){
+                recipient->tail->next = donor->head;
                 }
             else{
-                recipient->tail->next = donor->head;
+                recipient->head = donor->head;
                 }
             recipient->tail = donor->tail;
             }
