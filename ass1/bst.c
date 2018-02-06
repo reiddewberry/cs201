@@ -1,4 +1,6 @@
     #include <stdio.h>
+    #include <stdlib.h>
+    #include <assert.h>
     #include "bst.h"
     #include "queue.h"
 
@@ -19,23 +21,29 @@
         return bstNode;
         }
 
-    void *getBSTNODE(BSTNODE *node){
+    void *getBSTNODEvalue(BSTNODE *node){
         return node->data;
         }
 
-    void setBSTNODE(BSTNODE *node,void *value){
+    void setBSTNODEvalue(BSTNODE *node,void *value){
         node->data = value;
         }
 
     BSTNODE *getBSTNODEleft(BSTNODE *node){
+        if(node->left == 0){
+            return 0;
+            }
         return node->left;
         }
 
     void setBSTNODEleft(BSTNODE *node,BSTNODE *replacement){
-        node->left = replacement
+        node->left = replacement;
         }
 
     BSTNODE *getBSTNODEright(BSTNODE *node){
+        if(node->right == 0){
+            return 0;
+            }
         return node->right;
         }
 
@@ -44,6 +52,9 @@
         }
 
     BSTNODE *getBSTNODEparent(BSTNODE *node){
+        if(node->parent == 0){
+            return 0;
+            }
         return node->parent;
         }
 
@@ -52,12 +63,19 @@
         }
 
     void freeBSTNODE(BSTNODE *node,void (*freefunct)(void *value)){
-        if(free != 0){
+        if(freefunct == 0){
             freefunct(node->data);
             }
         free(node);
         }
 
+//Binary Search Tree section from here on
+
+    void swapFunct(BSTNODE *move,BSTNODE *dest){
+        void *valHolder = move->data;
+        move->data = dest->data;
+        dest->data = valHolder;
+        }
 
     typedef struct bst{
         BSTNODE *root;
@@ -69,13 +87,21 @@
         }BST;
 
     BST *newBST(
-        void (*display)(void *value,FILE *FP),               //display
-        int (*comp)(void *value,void *value),           //comparator. - lt, 0 eq, +  gt
-        void (*swap)(BSTNODE *move,BSTNODE *destination),    //swapper
-        void (*free)(void *value)){                          //free
+        void (*display)(void *value,FILE *FP),        //display
+        int (*comp)(void *val1,void *val2),           //comparator. - lt, 0 eq, +  gt
+        void (*swap)(BSTNODE *move,BSTNODE *dest),    //swapper
+        void (*free)(void *value)){                   //free
         BST *newBST = malloc(sizeof(BST));
         assert(newBST != 0);
         newBST->root = 0;
+        newBST->display = display;
+        newBST->comp = comp;
+        if(swap == 0){
+            newBST->swap = swapFunct;
+            }
+        else{newBST->swap = swap;}
+        newBST->free = free;
+        return newBST;
         };
 
     BSTNODE *getBSTroot(BST *tree){
@@ -96,6 +122,7 @@
         newNode->data = value;
         if(tree->root == 0){
             tree->root = newNode;
+            tree->size += 1;
             return newNode;
             }
         BSTNODE *compNode = tree->root;
@@ -104,6 +131,7 @@
                 if(compNode->left == 0){
                     compNode->left = newNode;
                     newNode->parent = compNode;
+                    tree->size += 1;
                     return newNode;
                     }
                 compNode = compNode->left;
@@ -112,6 +140,7 @@
                 if(compNode->right == 0){
                     compNode->right = newNode;
                     newNode->parent = compNode;
+                    tree->size += 1;
                     return newNode;
                     }
                 compNode = compNode->right;
@@ -135,39 +164,100 @@
                 if(compNode->right == 0){
                     return 0;
                     }
-                compNode = compNode->right
+                compNode = compNode->right;
                 }
             }
         }
 
-
-    BSTNODE *swapToLeafBST(BST *t,BSTNODE *node){
-        
+    BSTNODE *deleteBST(BST *tree,void *value){
+        BSTNODE *delNode = findBST(tree,value);
+        delNode = swapToLeafBST(tree,delNode);
+        pruneLeafBST(tree,delNode);
+        tree->size -= 1;
+        return delNode;
         }
 
-    void pruneLeafBST(BST *t,BSTNODE *leaf){
-        
+    BSTNODE *swapToLeafBST(BST *tree,BSTNODE *node){
+        BSTNODE *leafNode = node;
+        while(leafNode->left != 0 && leafNode->right != 0){
+            if(node->right != 0){
+                tree->swap(leafNode,leafNode->right);
+                leafNode = leafNode->right;
+                }
+            if(node->left != 0){
+                tree->swap(leafNode,leafNode->left);
+                leafNode = leafNode->left;
+                }
+            }
+        return leafNode;
         }
 
-    BSTNODE *deleteBST(BST *t,void *value){
-        
+    void pruneLeafBST(BST *tree,BSTNODE *leaf){
+        if(leaf == tree->root){
+            tree->root = 0;
+            tree->size -=1;
+            return;
+            }
+        if(leaf->parent->right == leaf){
+            leaf->parent->right = 0;
+            leaf->parent = 0;
+            tree->size -= 1;
+            }
+        else{
+            leaf->parent->left = 0;
+            leaf->parent = 0;
+            tree->size -= 1;
+            }
         }
 
-    int sizeBST(BST *t){
-        
+    int sizeBST(BST *tree){
+        return tree->size;
         }
 
-    void statisticsBST(BST *t,FILE *fp){
-        
+    void statisticsBST(BST *tree,FILE *fp){
+        fprintf(fp,"Nodes: %d\n", tree->size);
+        if(tree->root == 0){
+            fprintf(fp,"Minimum depth: -1");
+            fprintf(fp,"Maximum depth: -1");
+            return;
+            }
+        //min depth
+        if(tree->size < 3){
+            fprintf(fp,"Minimum depth: 1\n");
+            }
+        else{fprintf(fp,"Minimum depth: 2\n");}
+        //max depth
+        int max = 0;
+        if(tree->size % 2 == 0){
+            max = tree->size/2;
+            }
+        else{
+            max = (tree->size+1)/2;
+            }
+        fprintf(fp,"Maximum depth: %d\n", max);
         }
 
-    void displayBST(BST *t,FILE *fp){
-        
+    void displayBST(BST *tree,FILE *fp){
+        if(tree->size == 0){
+            fprintf(fp,"[]");
+            }
+        //BSTNODE *printNode = tree->root;
         }
 
-    void displayBSTdebug(BST *t,FILE *fp){
-        
+    void displayBSTdebug(BST *tree,FILE *fp){
+        if(tree->size == 0){return;}
+        fprintf(fp,"\nsomething should be here.\n");
+        //things happen
         }
 
-    void freeBST(BST *t){
+    void freeBST(BST *tree){
+        BSTNODE *remNode;
+        while(tree->root != 0){
+            remNode = swapToLeafBST(tree,tree->root);
+            pruneLeafBST(tree,remNode);
+            if(tree->free != 0){
+                tree->free(remNode->data);
+                }
+            free(remNode);
+            }
         }
