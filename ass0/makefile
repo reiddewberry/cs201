@@ -1,44 +1,20 @@
-BJS = integer.o real.o string.o sll.o dll.o stack.o queue.o
+OBJS = integer.o real.o sll.o dll.o stack.o queue.o
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : clears test-sll dll-0-14
+all : test-sll test-dll test-stack test-queue
 
-clears :
-	clear
+test-sll : test-sll.c sll.h integer.h integer.o sll.o
+	gcc $(LOPTS) test-sll.c integer.o sll.o -o test-sll
 
-test-sll : test-sll.o integer.o sll.o
-	gcc $(LOPTS) test-sll.o integer.o sll.o  -o test-sll
+test-dll : test-dll.c dll.h dll.o integer.o
+	gcc $(LOPTS) test-dll.c integer.o dll.o -o test-dll
 
-test-dll : test-dll.o integer.o dll.o
-	gcc $(LOPTS) test-dll.o integer.o dll.o -o test-dll
+test-stack : test-stack.c stack.h integer.h dll.o integer.o stack.o
+	gcc $(LOPTS) test-stack.c integer.o dll.o stack.o -o test-stack
 
-dll-0-14 : dll-0-14.o integer.o dll.o
-	gcc $(LOPTS) dll-0-14.o integer.o dll.o -o dll-0-14
-
-test-stack : test-stack.o integer.o dll.o stack.o
-	gcc $(LOPTS) test-stack.o integer.o dll.o stack.o -o test-stack
-
-test-queue : test-queue.o integer.o sll.o queue.o
-	gcc $(LOPTS) test-queue.o integer.o sll.o queue.o -o test-queue
-
-test-sll.o : test-sll.c sll.h integer.h
-	gcc $(OOPTS) test-sll.c
-
-test-dll.o : test-dll.c dll.h integer.h
-	gcc $(OOPTS) test-dll.c
-
-test-stack.o : test-stack.c stack.h integer.h
-	gcc $(OOPTS) test-stack.c
-
-test-queue.o : test-queue.c queue.h integer.h
-	gcc $(OOPTS) test-queue.c
-
-stack.o : stack.c stack.h
-	gcc $(OOPTS) stack.c
-
-queue.o : queue.c queue.h dll.h
-	gcc $(OOPTS) queue.c
+test-queue : test-queue.c integer.h sll.o queue.o integer.o
+	gcc $(LOPTS) test-queue.c integer.o sll.o queue.o -o test-queue
 
 sll.o : sll.c sll.h
 	gcc $(OOPTS) sll.c
@@ -46,19 +22,19 @@ sll.o : sll.c sll.h
 dll.o : dll.c dll.h
 	gcc $(OOPTS) dll.c
 
+stack.o : stack.c stack.h
+	gcc $(OOPTS) stack.c
+
+queue.o : queue.c queue.h
+	gcc $(OOPTS) queue.c
+
 integer.o : integer.c integer.h
 	gcc $(OOPTS) integer.c
-
-real.o : real.c real.h
-	gcc $(OOPTS) real.c
-
-string.o : string.c string.h
-	gcc $(OOPTS) string.c
 
 valgrind  : all
 	echo testing singly-linked list
 	valgrind ./test-sll
-	echo
+
 
 test : all
 	echo testing singly-linked list
@@ -75,4 +51,20 @@ test : all
 	echo
 
 clean    :
-	rm -f $(OBJS) test-*.o *.o vgcore.* test-stack test-queue test-sll test-dll
+	rm -f $(OBJS) test-*.o *.o test-stack test-queue test-sll test-dll
+
+# Using test server test files
+
+#test-sll : sll-0-0.c sll.h integer.h integer.o sll.o
+#	gcc $(LOPTS) sll-0-0.c integer.o sll.o -o test-sll
+
+#test-dll : dll-0-0.c dll.h real.h real.o dll.o integer.o
+#	gcc $(LOPTS) dll-0-0.c integer.o real.o dll.o -o test-dll
+
+#test-stack : stack-0-0.c stack.h integer.h dll.o integer.o stack.o
+#	gcc $(LOPTS) stack-0-0.c integer.o dll.o stack.o -o test-stack
+
+#test-queue : queue-0-0.c queue.h sll.h integer.h integer.o
+#	gcc $(LOPTS) queue-0-0.c integer.o -o test-queue
+
+

@@ -10,7 +10,7 @@
         }BSTNODE;
 
     BSTNODE *newBSTNODE(void *value){
-        newBSTNODE *bstNode = malloc(sizeof(BSTNODE));
+        BSTNODE *bstNode = malloc(sizeof(BSTNODE));
         assert(bstNode != 0);
         bstNode->data = value;
         bstNode->parent = 0;
@@ -24,9 +24,7 @@
         }
 
     void setBSTNODE(BSTNODE *node,void *value){
-        void *returnVal = node->data;
         node->data = value;
-        return returnVal;
         }
 
     BSTNODE *getBSTNODEleft(BSTNODE *node){
@@ -61,31 +59,74 @@
         }
 
 
-
     typedef struct bst{
         BSTNODE *root;
         int size;
         void (*display)(void *, FILE *);
-
+        int (*comp)(void *, void *);
+        void (*swap)(BSTNODE *move, BSTNODE *dest);
+        void (*free)(void *);
         }BST;
 
-
     BST *newBST(
-        void (*display)(void *value,FILE *FP),           //display
-        int (*comp)(void *value,void *value),            //comparator
-        void (*swap)(BSTNODE *move,BSTNODE *destination),     //swapper
-        void (*free)(void *value));                 //free
+        void (*display)(void *value,FILE *FP),               //display
+        int (*comp)(void *value,void *value),                //comparator
+        void (*swap)(BSTNODE *move,BSTNODE *destination),    //swapper
+        void (*free)(void *value)){                          //free
+        BST *newBST = malloc(sizeof(BST));
+        assert(newBST != 0);
+        newBST->root = 0;
+        };
 
-    BSTNODE *getBSTroot(BST *t);
-    void    setBSTroot(BST *t,BSTNODE *replacement);
-    void    setBSTsize(BST *t,int s);
-    BSTNODE *insertBST(BST *t,void *value);
-    BSTNODE *findBST(BST *t,void *value);
+    BSTNODE *getBSTroot(BST *tree){
+        return tree->root;
+        }
+
+    void setBSTroot(BST *tree,BSTNODE *replacement){
+        tree->root = replacement;
+        }
+
+    void setBSTsize(BST *tree,int size){
+        tree->size = size;
+        }
+
+    BSTNODE *insertBST(BST *tree,void *value){
+        BSTNODE *newNode = malloc(sizeof(BSTNODE));
+        assert(newNode != 0);
+        newNode->data = value;
+        if(tree->root == 0){
+            tree->root = newNode;
+            return newNode;
+            }
+        BSTNODE *compNode = tree->root;
+        while(1){
+            if(value < compNode->data){
+                if(compNode->left == 0){
+                    compNode->left = newNode;
+                    newNode->parent = compNode;
+                    return newNode;
+                    }
+                compNode = compNode->left;
+                }
+            else{
+                if(compNode->right == 0){
+                    compNode->right = newNode;
+                    newNode->parent = compNode;
+                    return newNode;
+                    }
+                compNode = compNode->right;
+                }
+            }
+        }
+
+    BSTNODE *findBST(BST *tree,void *value){
+        }
+
     BSTNODE *deleteBST(BST *t,void *value);
     BSTNODE *swapToLeafBST(BST *t,BSTNODE *node);
-    void    pruneLeafBST(BST *t,BSTNODE *leaf);
-    int     sizeBST(BST *t);
-    void    statisticsBST(BST *t,FILE *fp);
-    void    displayBST(BST *t,FILE *fp);
-    void    displayBSTdebug(BST *t,FILE *fp);
-    void    freeBST(BST *t);
+    void pruneLeafBST(BST *t,BSTNODE *leaf);
+    int sizeBST(BST *t);
+    void statisticsBST(BST *t,FILE *fp);
+    void displayBST(BST *t,FILE *fp);
+    void displayBSTdebug(BST *t,FILE *fp);
+    void freeBST(BST *t);
