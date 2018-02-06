@@ -70,7 +70,7 @@
 
     BST *newBST(
         void (*display)(void *value,FILE *FP),               //display
-        int (*comp)(void *value,void *value),                //comparator
+        int (*comp)(void *value,void *value),           //comparator. - lt, 0 eq, +  gt
         void (*swap)(BSTNODE *move,BSTNODE *destination),    //swapper
         void (*free)(void *value)){                          //free
         BST *newBST = malloc(sizeof(BST));
@@ -100,7 +100,7 @@
             }
         BSTNODE *compNode = tree->root;
         while(1){
-            if(value < compNode->data){
+        if(tree->comp(newNode->data,compNode->data) < 0){
                 if(compNode->left == 0){
                     compNode->left = newNode;
                     newNode->parent = compNode;
@@ -120,13 +120,54 @@
         }
 
     BSTNODE *findBST(BST *tree,void *value){
+        BSTNODE *compNode = tree->root;
+        while(1){
+            if(tree->comp(value,compNode->data) < 0){
+                if(compNode->left == 0){
+                    return 0;
+                    }
+                compNode = compNode->left;
+                }
+            else{
+                if(tree->comp(value,compNode->data) == 0){
+                    return compNode;
+                    }
+                if(compNode->right == 0){
+                    return 0;
+                    }
+                compNode = compNode->right
+                }
+            }
         }
 
-    BSTNODE *deleteBST(BST *t,void *value);
-    BSTNODE *swapToLeafBST(BST *t,BSTNODE *node);
-    void pruneLeafBST(BST *t,BSTNODE *leaf);
-    int sizeBST(BST *t);
-    void statisticsBST(BST *t,FILE *fp);
-    void displayBST(BST *t,FILE *fp);
-    void displayBSTdebug(BST *t,FILE *fp);
-    void freeBST(BST *t);
+
+    BSTNODE *swapToLeafBST(BST *t,BSTNODE *node){
+        
+        }
+
+    void pruneLeafBST(BST *t,BSTNODE *leaf){
+        
+        }
+
+    BSTNODE *deleteBST(BST *t,void *value){
+        
+        }
+
+    int sizeBST(BST *t){
+        
+        }
+
+    void statisticsBST(BST *t,FILE *fp){
+        
+        }
+
+    void displayBST(BST *t,FILE *fp){
+        
+        }
+
+    void displayBSTdebug(BST *t,FILE *fp){
+        
+        }
+
+    void freeBST(BST *t){
+        }
