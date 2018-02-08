@@ -127,7 +127,7 @@
             }
         BSTNODE *compNode = tree->root;
         while(1){
-        if(tree->comp(newNode->data,compNode->data) < 0){
+            if(tree->comp(newNode->data,compNode->data) < 0){
                 if(compNode->left == 0){
                     compNode->left = newNode;
                     newNode->parent = compNode;
@@ -150,6 +150,9 @@
 
     BSTNODE *findBST(BST *tree,void *value){
         BSTNODE *compNode = tree->root;
+        if(tree->size == 0){
+            return 0;
+            }
         while(1){
             if(tree->comp(value,compNode->data) < 0){
                 if(compNode->left == 0){
@@ -173,13 +176,16 @@
         BSTNODE *delNode = findBST(tree,value);
         delNode = swapToLeafBST(tree,delNode);
         pruneLeafBST(tree,delNode);
-        tree->size -= 1;
+        //tree->size -= 1;
         return delNode;
         }
 
     BSTNODE *swapToLeafBST(BST *tree,BSTNODE *node){
         BSTNODE *leafNode = node;
-        while(leafNode->left != 0 && leafNode->right != 0){
+        if(tree->size == 0){
+            return leafNode;
+            }
+        while(leafNode->left != 0 || leafNode->right != 0){
             if(node->right != 0){
                 tree->swap(leafNode,leafNode->right);
                 leafNode = leafNode->right;
@@ -239,14 +245,19 @@
 
     void displayBST(BST *tree,FILE *fp){
         if(tree->size == 0){
-            fprintf(fp,"[]");
+            fprintf(fp,"[empty]");
             }
         //BSTNODE *printNode = tree->root;
         }
 
     void displayBSTdebug(BST *tree,FILE *fp){
         if(tree->size == 0){return;}
-        fprintf(fp,"\nsomething should be here.\n");
+        if(tree->size == -1){
+            fprintf(fp,"\n*****this shouldnt happen*****\n");
+            }
+        printf("\n");
+        //fprintf(fp,"\n  debug here: level order  \n");
+        while(0){}
         //things happen
         }
 
