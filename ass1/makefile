@@ -2,10 +2,13 @@ OBJS = integer.o real.o sll.o dll.o stack.o queue.o
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : test-bst
+all : test-bst test-bst2
 
-test-bst : test-bst.c bst.h sll.h integer.h bst.o sll.o integer.o
-	gcc $(LOPTS) test-bst.c bst.o sll.o integer.o -o test-bst
+test-bst : test-bst.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
+	gcc $(LOPTS) test-bst.c bst.o queue.o sll.o integer.o -o test-bst
+
+test-bst2 : test-bst2.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
+	gcc $(LOPTS) test-bst2.c bst.o queue.o sll.o integer.o -o test-bst2
 
 test-sll : test-sll.c sll.h integer.h integer.o sll.o
 	gcc $(LOPTS) test-sll.c integer.o sll.o -o test-sll
