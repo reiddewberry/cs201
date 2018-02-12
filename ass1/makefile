@@ -2,13 +2,16 @@ OBJS = integer.o real.o sll.o dll.o stack.o queue.o
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : test-bst test-bst2
+all : test-heap
 
 test-bst : test-bst.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-bst.c bst.o queue.o sll.o integer.o -o test-bst
 
 test-bst2 : test-bst2.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-bst2.c bst.o queue.o sll.o integer.o -o test-bst2
+
+test-heap : test-heap.c heap.h bst.h queue.h stack.h sll.h dll.h integer.h heap.o bst.o queue.o stack.o sll.o dll.o integer.o
+	gcc $(LOPTS) test-heap.c heap.o bst.o queue.o stack.o sll.o dll.o integer.o -o test-heap
 
 test-sll : test-sll.c sll.h integer.h integer.o sll.o
 	gcc $(LOPTS) test-sll.c integer.o sll.o -o test-sll
@@ -21,6 +24,9 @@ test-stack : test-stack.c stack.h integer.h dll.o integer.o stack.o
 
 test-queue : test-queue.c integer.h sll.o queue.o integer.o
 	gcc $(LOPTS) test-queue.c integer.o sll.o queue.o -o test-queue
+
+heap.o : heap.c heap.h
+	gcc $(OOPTS) heap.c
 
 bst.o : bst.c bst.h
 	gcc $(OOPTS) bst.c

@@ -39,6 +39,7 @@
         newNode->data = value;
         newNode->prev = 0;
         newNode->next = 0;
+        //If its the head, set everything
         if(index == 0){
             newNode->prev = 0;
             newNode->next = items->head;
@@ -53,6 +54,7 @@
             items->size += 1;
             return;
             }
+        //If its the tail
         else if(index == items->size){
             items->tail->next = newNode;
             newNode->prev = items->tail;
@@ -60,6 +62,7 @@
             items->size += 1;
             return;
             }
+        //In between
         else{
             if(index < items->size/2){
                 int i = 0;
@@ -105,8 +108,8 @@
                 removeNode = removeNode->prev;
                 }
             }
+        void *removeVal = removeNode->data;
         if(removeNode == items->head){
-            void *removeVal = removeNode->data;
             if(items->size == 1){
                 items->head = 0;
                 items->tail = 0;
@@ -120,7 +123,6 @@
             free(removeNode);
             return removeVal;
             }
-        void *removeVal = removeNode->data;
         if(removeNode == items->tail){
             items->tail = removeNode->prev;
             items->tail->next = 0;

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include "bst.h"
 #include "integer.h"
-#include "real.h"
-#include "string.h"
+//#include "real.h"
+//#include "string.h"
 #include "stack.h"
 #include "queue.h"
 #include "heap.h"

@@ -5,7 +5,7 @@
 
     typedef struct bstnode BSTNODE;
 
-    extern BSTNODE *newBSTNODEvalue(void *v);
+    extern BSTNODE *newBSTNODE(void *v);
     extern void    *getBSTNODEvalue(BSTNODE *n);
     extern void    setBSTNODEvalue(BSTNODE *n,void *value);
     extern BSTNODE *getBSTNODEleft(BSTNODE *n);

@@ -21,6 +21,7 @@
         int (*c)(void *,void *),     //compare
         void (*f)(void *)){          //free
         HEAP *heap = malloc(sizeof(HEAP));
+        assert(heap != 0);
         heap->size = 0;
         heap->tree = newBST(d,0,0,f);
         heap->queue = newQUEUE(0,0);
@@ -28,12 +29,12 @@
         heap->display = d;
         heap->compare = c;
         heap->free = f;
-        return heap
+        return heap;
         }
 
     void insertHEAP(HEAP *heap,void *value){
-        BSTNODE *newNode = malloc(sizeof(BSTNODE));
-        setBSTNODEvalue(newNode,value);
+        BSTNODE *newNode = newBSTNODE(value);
+        assert(newNode != 0);
         enqueue(heap->queue,newNode);
         if(getBSTroot(heap->tree) == 0){
             setBSTroot(heap->tree,newNode);
@@ -51,22 +52,29 @@
             }
         push(heap->stack,newNode);
         heap->size += 1;
+        setBSTsize(heap->tree,(sizeBST(heap->tree)+1));
         }
 
-    static void bubbleDown(BSTNODE *bubbleNode){
+    static void bubbleDown(HEAP *heap,BSTNODE *bubbleNode){
         BSTNODE *leftChild = getBSTNODEleft(bubbleNode);
         BSTNODE *rightChild = getBSTNODEright(bubbleNode);
         if(leftChild == 0 && rightChild == 0){
             return;
             }
-        int compLeft = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
-        int compRight = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(rightChild) );
-        while(compLeft < 0 || compRight < 0){
+        int compLeft = 0;
+        int compRight = 0;
+        if(rightChild == 0){
+            compLeft = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
+            }
+        else{
+            compRight = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(rightChild) );
+            }
+        while(compLeft > 0 || compRight > 0){
             if(rightChild == 0){
-                if(compLeft < 0){
+                if(compLeft > 0){
                     void *tempVal = getBSTNODEvalue(bubbleNode);
                     setBSTNODEvalue(bubbleNode,getBSTNODEvalue(leftChild));
-                    setBSTNODEvalue(getBSTNODEvalue(leftChild),tempVal);
+                    setBSTNODEvalue(leftChild,tempVal);
                     bubbleNode = getBSTNODEleft(bubbleNode);
                     }
                 }
@@ -74,20 +82,20 @@
                 if(heap->compare(getBSTNODEvalue(leftChild),getBSTNODEvalue(rightChild)) < 0){
                     void *tempVal = getBSTNODEvalue(bubbleNode);
                     setBSTNODEvalue(bubbleNode,getBSTNODEvalue(leftChild));
-                    setBSTNODEvalue(getBSTNODEvalue(leftChild),tempVal);
+                    setBSTNODEvalue(leftChild,tempVal);
                     bubbleNode = getBSTNODEleft(bubbleNode);
                     }
                 else{
                     void *tempVal = getBSTNODEvalue(bubbleNode);
                     setBSTNODEvalue(bubbleNode,getBSTNODEvalue(rightChild));
-                    setBSTNODEvalue(getBSTNODEvalue(rightChild),tempVal);
+                    setBSTNODEvalue(rightChild,tempVal);
                     bubbleNode = getBSTNODEright(bubbleNode);
                     }
             }
             leftChild = getBSTNODEleft(bubbleNode);
             rightChild = getBSTNODEright(bubbleNode);
             if(leftChild == 0){
-                break
+                break;
                 }
             if(rightChild == 0){
                 heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
@@ -102,9 +110,12 @@
     //creates the max or min heap by heapify. (bubble down)
     void buildHEAP(HEAP *heap){
         int i = 0;
+        freeQUEUE(heap->queue);
+        heap->queue = newQUEUE(0,0);
         for(i=0;i < heap->size; i++){
-            BSTNODE *heapifyNode = pop(head->stack);
-            bubbleDown(heapifyNode);
+            BSTNODE *heapifyNode = pop(heap->stack);
+            enqueue(heap->queue,heapifyNode);
+            bubbleDown(heap,heapifyNode);
             }
         }
 
@@ -116,9 +127,16 @@
     //switches the farthest right leaf with the root
     //and frees the value. Then bubbles the new root down
     void *extractHEAP(HEAP *heap){
-        BSTNODE *newRoot = pop(heap->stack);
-        void *rootVal = getBSTNODEvalue(getBSTroot(heap->tree));
-        setBSTNODEvalue(getBSTroot(heap->tree),getBSTNODEvalue(newRoot));
+        BSTNODE *newRoot = dequeue(heap->queue);
+        BSTNODE *heapRoot = getBSTroot(heap->tree);
+        void *rootVal = getBSTNODEvalue(heapRoot);
+        setBSTNODEvalue(heapRoot,getBSTNODEvalue(newRoot));
+        if(getBSTNODEparent(newRoot) == 0){
+            setBSTsize(heap->tree,0);
+            setBSTroot(heap->tree,0);
+            heap->size -= 1;
+            return rootVal;
+            }
         if(getBSTNODEleft(getBSTNODEparent(newRoot)) == newRoot){
             setBSTNODEleft(getBSTNODEparent(newRoot),0);
             }
@@ -126,8 +144,8 @@
             setBSTNODEright(getBSTNODEparent(newRoot),0);
             }
         free(newRoot);
-        BSTNODE *bubbleNode = getBSTroot(heap->tree);
-        bubbleDown(bubbleNode);
+        bubbleDown(heap,heapRoot);
+        setBSTsize(heap->tree,sizeBST(heap->tree)-1);
         heap->size -= 1;
         return rootVal;
         }
@@ -141,7 +159,7 @@
         }
 
     void displayHEAPdebug(HEAP *heap,FILE *fp){
-        fprintf(fp,"heap size: %d\n",heap->size;
+        fprintf(fp,"heap size: %d\n",heap->size);
         fprintf(fp,"bst size: %d\n",sizeBST(heap->tree));
         displayBSTdebug(heap->tree,fp);
         }
@@ -150,4 +168,5 @@
         freeBST(heap->tree);
         freeQUEUE(heap->queue);
         freeSTACK(heap->stack);
+        free(heap);
         }
