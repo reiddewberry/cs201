@@ -1,8 +1,12 @@
 OBJS = integer.o real.o sll.o dll.o stack.o queue.o
+OBJSH = integer.h real.h sll.h dll.h stack.h queue.h
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : test-heap
+all : clears test-bst test-bst2 test-heap heapsort
+
+clears :
+	clear
 
 test-bst : test-bst.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-bst.c bst.o queue.o sll.o integer.o -o test-bst
@@ -12,6 +16,9 @@ test-bst2 : test-bst2.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o intege
 
 test-heap : test-heap.c heap.h bst.h queue.h stack.h sll.h dll.h integer.h heap.o bst.o queue.o stack.o sll.o dll.o integer.o
 	gcc $(LOPTS) test-heap.c heap.o bst.o queue.o stack.o sll.o dll.o integer.o -o test-heap
+
+heapsort : heapsort.c heap.h bst.h string.h scanner.h $(OBJSH) heap.o bst.o string.o scanner.o $(OBJS)
+	gcc $(LOPTS) heapsort.c heap.o bst.o $(OBJS) string.o scanner.o -o heapsort
 
 test-sll : test-sll.c sll.h integer.h integer.o sll.o
 	gcc $(LOPTS) test-sll.c integer.o sll.o -o test-sll

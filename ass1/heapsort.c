@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <integer.h>
-#include <real.h>
-#include <string.h>
+#include <assert.h>
+#include "integer.h"
+#include "real.h"
+#include "string.h"
+#include "scanner.h"
 #include "stack.h"
 #include "queue.h"
 #include "bst.h"
@@ -14,84 +16,143 @@ int realSort = 0;   //option -r sorts file of reals
 int strSort = 0;    //option -s sorts file of strings
 int incOrd = 0;     //option -I sort in Inreasing Order (DEFAULT)
 int decOrd = 0;     //option -D sort in Decreasing Order
+char *inputName = NULL; //input filename
 
-void Fatal(){
-    }
-
-static int processOptions(int,char **){
-    int argIndex;
-    int argUsed;
-    int separateArg;
-    char *arg;
-    argIndex = 1;
-    while (argIndex < argc && *argv[argIndex] == '-')
-        {
-        /* check if stdin, represented by "-" is an argument */
-        /* if so, the end of options has been reached */
-        if (argv[argIndex][1] == '\0') return argIndex;
-        separateArg = 0;
-        argUsed = 0;
-        if (argv[argIndex][2] == '\0')
-            {
-            arg = argv[argIndex+1];
-            separateArg = 1;
-            }
-        else
-            arg = argv[argIndex]+2;
-
-        switch (argv[argIndex][1])
-            {
-            /*
-             * when option has an argument, do this
-             *
-             *     examples are -m4096 or -m 4096
-             *
-             *     case 'm':
-             *         MemorySize = atol(arg);
-             *         argUsed = 1;
-             *         break;
-             *
-             *
-             * when option does not have an argument, do this
-             *
-             *     example is -a
-             *
-             *     case 'a':
-             *         PrintActions = 1;
-             *         break;
-             */
-            case 'n':
-                Number = atoi(arg);
-                argUsed = 1;
-                break;
-            case 's':
-                Special = 1;
-                break;
-            case 'N':
-                Name = strdup(arg);
-                argUsed = 1;
-                break;
-            default:
-                Fatal("option %s not understood\n",argv[argIndex]);
-            }
-        if (separateArg && argUsed)
-            ++argIndex;
-        ++argIndex;
-        }
-    return argIndex;
-    }
+static void processCommandLineArgs(int argc,char **argv);
+static void readFileToHeap(HEAP *sortHeap);
 
 int main(int argc,char **argv){
-    int argIndex = 0;
-
-    if(argc == 1){Fatal("%d arguements!\n",argc-1);}
-
-    argIndex = processOptions(argc,argv);
-
-    if(argIndex == argc){
+    processCommandLineArgs(argc,argv);
+    if(version){
+        printf("Written by Reid Dewberry\n");
+        printf("My heapsort works in nlog(n) time because adding a value takes contant time because the farthest right leaf is always held first in the stack and can be peeked and added to in constant time. Ordering the heap takes linear time because it calls n/2 nodes to sort and the sort takes less than log(n) therefore it is the same as the time of n. extracting the min/max takes log time because the min/max is always the root of the tree and can be swapped with the furthest right leaf. After swapping the new root must be sorted which takes log time due to the usefulness of a tree structure. Therefore alltogether it works out to nlog(n).\n");
+        return 0;
+        }
+    assert(inputName);
+    HEAP *sortHeap;
+    if(realSort){
+        if(decOrd){
+            sortHeap = newHEAP(displayREAL,compareREALdec,freeREAL);
+            }
+        else{
+            sortHeap = newHEAP(displayREAL,compareREAL,freeREAL);
+            }
+        }
+    else if(strSort){
+        if(decOrd){
+            sortHeap = newHEAP(displaySTRING,compareSTRINGdecr,freeSTRING);
+            }
+        else{
+            sortHeap = newHEAP(displaySTRING,compareSTRINGdecr,freeSTRING);
+            }
         }
     else{
-        
+        if(decOrd){
+            sortHeap = newHEAP(displayINTEGER,compareINTEGERdec,freeINTEGER);
+            }
+        else{
+            sortHeap = newHEAP(displayINTEGER,compareINTEGER,freeINTEGER);
+            }
+        }
+    readFileToHeap(sortHeap);
+    buildHEAP(sortHeap);
+    if(realSort){
+        for(int i=0;i<sizeHEAP(sortHeap);i++){
+            void *value = extractHEAP(sortHeap);
+            displayREAL(value,stdout);
+            free(value);
+            }
+        freeHEAP(sortHeap);
+        }
+    else if(strSort){
+        for(int i=0;i<sizeHEAP(sortHeap);i++){
+            void *value = extractHEAP(sortHeap);
+            displaySTRING(value,stdout);
+            free(value);
+            }
+        freeHEAP(sortHeap);
+        }
+    else{
+        for(int i=0;i<sizeHEAP(sortHeap);i++){
+            void *value = extractHEAP(sortHeap);
+            displayINTEGER(value,stdout);
+            free(value);
+            }
+        freeHEAP(sortHeap);
         }
     return 0;
+    }
+
+void processCommandLineArgs(int argc,char **argv){
+    if(argc < 3){
+        if(argv[1][1] == 'v' && argv[1][0] == '-'){
+            version = 1;
+            return;
+            }
+
+        }
+    for(int i=1; i<argc-1; i++){
+        switch(argv[i][1]){
+            case 'v':
+                version = 1;
+                break;
+            case 'i':
+                intSort = 1;
+                break;
+            case 'r':
+                realSort = 1;
+                break;
+            case 's':
+                strSort = 1;
+                break;
+            case 'I':
+                incOrd = 1;
+                break;
+            case 'D':
+                decOrd = 1;
+                break;
+            default:
+                break;
+            }
+        }
+    inputName = argv[argc-1];
+    }
+
+void readFileToHeap(HEAP *sortHeap){
+    FILE *fp = fopen(inputName,"r");
+    if(realSort){
+        REAL *value = newREAL(readReal(fp));
+        while(!feof(fp)){
+            insertHEAP(sortHeap,value);
+            value = newREAL(readReal(fp));
+            }
+        free(value);
+        }
+    else if(strSort){
+        if(stringPending(fp)){
+            STRING *value = newSTRING(readString(fp));
+            while(!feof(fp)){
+                insertHEAP(sortHeap,value);
+                value = newSTRING(readString(fp));
+                }
+            free(value);
+            }
+        else{
+            STRING *value = newSTRING(readToken(fp));
+            while(!feof(fp)){
+                insertHEAP(sortHeap,value);
+                value = newSTRING(readToken(fp));
+                }
+            free(value);
+            }
+        }
+    else{
+        INTEGER *value = newINTEGER(readInt(fp));
+        while(!feof(fp)){
+            insertHEAP(sortHeap,value);
+            value = newINTEGER(readInt(fp));
+            }
+        free(value);
+        }
+    fclose(fp);
     }

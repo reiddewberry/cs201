@@ -279,7 +279,7 @@
         }
 
     static int minDepthBST(BSTNODE *root){
-        if(root->left == 0 && root->right == 0){
+        if(root->left == 0 || root->right == 0){
             return 0;
             }
         if(root->left == 0){
@@ -359,6 +359,7 @@
                 }
             fprintf(fp,"\n");
             }
+        freeQUEUE(printQ);
         }
 
     void displayBSTdebug(BST *tree,FILE *fp){
