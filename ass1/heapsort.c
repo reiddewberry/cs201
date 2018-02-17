@@ -43,7 +43,7 @@ int main(int argc,char **argv){
             sortHeap = newHEAP(displaySTRING,compareSTRINGdecr,freeSTRING);
             }
         else{
-            sortHeap = newHEAP(displaySTRING,compareSTRINGdecr,freeSTRING);
+            sortHeap = newHEAP(displaySTRING,compareSTRING,freeSTRING);
             }
         }
     else{
@@ -57,29 +57,39 @@ int main(int argc,char **argv){
     readFileToHeap(sortHeap);
     buildHEAP(sortHeap);
     if(realSort){
-        for(int i=0;i<sizeHEAP(sortHeap);i++){
-            void *value = extractHEAP(sortHeap);
-            displayREAL(value,stdout);
+        void *value = extractHEAP(sortHeap);
+        displayREAL(value,stdout);
+        while(sizeHEAP(sortHeap) > 0){
+            printf(" ");
             free(value);
+            value = extractHEAP(sortHeap);
+            displayREAL(value,stdout);
             }
         freeHEAP(sortHeap);
         }
     else if(strSort){
-        for(int i=0;i<sizeHEAP(sortHeap);i++){
-            void *value = extractHEAP(sortHeap);
-            displaySTRING(value,stdout);
+        void *value = extractHEAP(sortHeap);
+        displaySTRING(value,stdout);
+        while(sizeHEAP(sortHeap) > 0){
+            printf(" ");
             free(value);
+            value = extractHEAP(sortHeap);
+            displaySTRING(value,stdout);
             }
         freeHEAP(sortHeap);
         }
     else{
-        for(int i=0;i<sizeHEAP(sortHeap);i++){
-            void *value = extractHEAP(sortHeap);
-            displayINTEGER(value,stdout);
+        void *value = extractHEAP(sortHeap);
+        displayINTEGER(value,stdout);
+        while(sizeHEAP(sortHeap) > 0){
+            printf(" ");
             free(value);
+            value = extractHEAP(sortHeap);
+            displayINTEGER(value,stdout);
             }
         freeHEAP(sortHeap);
         }
+    printf("\n");
     return 0;
     }
 

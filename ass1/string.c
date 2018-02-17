@@ -40,16 +40,16 @@ displaySTRING(void *v,FILE *fp)
     }
 
 
-int 
+int
 compareSTRING(void *v,void *w)
     {
-    return strcmp(v,w);
+    return strcmp(getSTRING(v),getSTRING(w));
     }
 
-int 
+int
 compareSTRINGdecr(void *v,void *w)
     {
-    return strcmp(w,v);
+    return strcmp(getSTRING(w),getSTRING(v));
     }
 
 void

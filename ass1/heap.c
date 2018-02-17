@@ -67,6 +67,7 @@
             compLeft = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
             }
         else{
+            compLeft = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
             compRight = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(rightChild) );
             }
         while(compLeft > 0 || compRight > 0){
@@ -137,12 +138,7 @@
             heap->size -= 1;
             return rootVal;
             }
-        if(getBSTNODEleft(getBSTNODEparent(newRoot)) == newRoot){
-            setBSTNODEleft(getBSTNODEparent(newRoot),0);
-            }
-        else{
-            setBSTNODEright(getBSTNODEparent(newRoot),0);
-            }
+        pruneLeafBST(heap->tree,newRoot);
         free(newRoot);
         bubbleDown(heap,heapRoot);
         setBSTsize(heap->tree,sizeBST(heap->tree)-1);

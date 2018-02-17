@@ -179,6 +179,7 @@
         BSTNODE *delNode = findBST(tree,value);
         delNode = swapToLeafBST(tree,delNode);
         pruneLeafBST(tree,delNode);
+        tree->size--;
         return delNode;
         }
 
@@ -243,18 +244,15 @@
     void pruneLeafBST(BST *tree,BSTNODE *leaf){
         if(leaf == tree->root){
             tree->root = 0;
-            tree->size -=1;
             return;
             }
         if(leaf->parent->right == leaf){
             leaf->parent->right = 0;
             leaf->parent = 0;
-            tree->size -= 1;
             }
         else{
             leaf->parent->left = 0;
             leaf->parent = 0;
-            tree->size -= 1;
             }
         }
 
