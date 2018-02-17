@@ -9,7 +9,7 @@ extern long int random(void);
 int
 main(void)
     {
-    srandom(1);
+    srandom(9383);
     SLL *p = newSLL(displayINTEGER,freeINTEGER);
     insertSLL(p,0,newINTEGER(3));
     insertSLL(p,sizeSLL(p),newINTEGER(2));

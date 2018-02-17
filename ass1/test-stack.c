@@ -10,7 +10,7 @@ extern long int random(void);
 int
 main(void)
     {
-    srandom(1);
+    srandom(9383);
     STACK *p = newSTACK(displayINTEGER,freeINTEGER);
     push(p,newINTEGER(3));
     push(p,newINTEGER(4));

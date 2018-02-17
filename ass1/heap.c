@@ -65,6 +65,7 @@
         int compRight = 0;
         if(rightChild == 0){
             compLeft = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
+            compRight = 0;
             }
         else{
             compLeft = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
@@ -76,7 +77,7 @@
                     void *tempVal = getBSTNODEvalue(bubbleNode);
                     setBSTNODEvalue(bubbleNode,getBSTNODEvalue(leftChild));
                     setBSTNODEvalue(leftChild,tempVal);
-                    bubbleNode = getBSTNODEleft(bubbleNode);
+                    bubbleNode = leftChild;
                     }
                 }
             else{
@@ -84,13 +85,13 @@
                     void *tempVal = getBSTNODEvalue(bubbleNode);
                     setBSTNODEvalue(bubbleNode,getBSTNODEvalue(leftChild));
                     setBSTNODEvalue(leftChild,tempVal);
-                    bubbleNode = getBSTNODEleft(bubbleNode);
+                    bubbleNode = leftChild;
                     }
                 else{
                     void *tempVal = getBSTNODEvalue(bubbleNode);
                     setBSTNODEvalue(bubbleNode,getBSTNODEvalue(rightChild));
                     setBSTNODEvalue(rightChild,tempVal);
-                    bubbleNode = getBSTNODEright(bubbleNode);
+                    bubbleNode = rightChild;
                     }
             }
             leftChild = getBSTNODEleft(bubbleNode);
@@ -99,21 +100,21 @@
                 break;
                 }
             if(rightChild == 0){
-                heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
+                compLeft = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
+                compRight = 0;
                 }
             else{
-                heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
-                heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(rightChild) );
+                compLeft = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(leftChild) );
+                compRight = heap->compare( getBSTNODEvalue(bubbleNode) , getBSTNODEvalue(rightChild) );
                 }
             }
         }
 
     //creates the max or min heap by heapify. (bubble down)
     void buildHEAP(HEAP *heap){
-        int i = 0;
         freeQUEUE(heap->queue);
         heap->queue = newQUEUE(0,0);
-        for(i=0;i < heap->size; i++){
+        for(int i=0;i < heap->size; i++){
             BSTNODE *heapifyNode = pop(heap->stack);
             enqueue(heap->queue,heapifyNode);
             bubbleDown(heap,heapifyNode);

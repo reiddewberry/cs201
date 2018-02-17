@@ -179,7 +179,9 @@
         BSTNODE *delNode = findBST(tree,value);
         delNode = swapToLeafBST(tree,delNode);
         pruneLeafBST(tree,delNode);
-        tree->size--;
+        if(delNode != 0){
+            tree->size--;
+            }
         return delNode;
         }
 
@@ -192,9 +194,13 @@
                     while(leafNode->left != 0){
                         leafNode = leafNode->left;
                         }
+                    tree->swap(initNode,leafNode);
+                    initNode = leafNode;
                     }
                 else{
                     leafNode =leafNode->right;
+                    tree->swap(initNode,leafNode);
+                    initNode = leafNode;
                     }
                 }
             if(leafNode->left != 0){
@@ -214,9 +220,13 @@
                     while(leafNode->right != 0){
                         leafNode = leafNode->right;
                         }
+                    tree->swap(initNode,leafNode);
+                    initNode = leafNode;
                     }
                 else{
                     leafNode =leafNode->left;
+                    tree->swap(initNode,leafNode);
+                    initNode = leafNode;
                     }
                 }
             if(leafNode->right != 0){
@@ -229,7 +239,7 @@
 
     BSTNODE *swapToLeafBST(BST *tree,BSTNODE *node){
         BSTNODE *leafNode = node;
-        if(tree->size == 0){
+        if(tree->size == 0 || leafNode == 0){
             return leafNode;
             }
         if(leafNode->right != 0){
@@ -242,6 +252,9 @@
         }
 
     void pruneLeafBST(BST *tree,BSTNODE *leaf){
+        if(leaf == 0){
+            return;
+            }
         if(leaf == tree->root){
             tree->root = 0;
             return;
@@ -278,7 +291,7 @@
 
     static int minDepthBST(BSTNODE *root){
         if(root->left == 0 || root->right == 0){
-            return 0;
+            return 1;
             }
         if(root->left == 0){
             return minDepthBST(root->right)+1;
@@ -286,7 +299,7 @@
         if(root->right == 0){
             return minDepthBST(root->left)+1;
             }
-        if(minDepthBST(root->left) >= minDepthBST(root->right)){
+        if(minDepthBST(root->left) <= minDepthBST(root->right)){
             return minDepthBST(root->left)+1;
             }
         else{
@@ -330,7 +343,7 @@
 
     void displayBST(BST *tree,FILE *fp){
         preDisplayBST(tree,tree->root,fp);
-        fprintf(fp,"]");
+        fprintf(fp,"]\n");
         }
 
     static void levelDisplayBST(BST *tree,FILE *fp){
@@ -345,7 +358,6 @@
             while(sizeQ > 0){
                 printNode = peekQUEUE(printQ);
                 tree->display(printNode->data,fp);
-                fprintf(fp," ");
                 dequeue(printQ);
                 if(printNode->left != 0){
                     enqueue(printQ,printNode->left);
@@ -354,6 +366,9 @@
                     enqueue(printQ,printNode->right);
                     }
                 sizeQ -= 1;
+                if(sizeQ > 0){
+                    fprintf(fp," ");
+                    }
                 }
             fprintf(fp,"\n");
             }

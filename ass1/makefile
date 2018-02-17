@@ -3,10 +3,7 @@ OBJSH = integer.h real.h sll.h dll.h stack.h queue.h
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : clears test-bst test-bst2 test-heap heapsort
-
-clears :
-	clear
+all : test-bst test-heap heapsort
 
 test-bst : test-bst.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-bst.c bst.o queue.o sll.o integer.o -o test-bst
@@ -53,27 +50,18 @@ queue.o : queue.c queue.h
 integer.o : integer.c integer.h
 	gcc $(OOPTS) integer.c
 
-valgrind  : all
+valgrind  : test-bst
 	echo testing singly-linked list
-	valgrind ./test-sll
+	valgrind ./test-bst
 
 
-test : all
-	echo testing singly-linked list
-	./test-sll
-	echo
+test : test-heap
 	echo testing doubly-linked list
-	./test-dll
-	echo
-	echo testing stack
-	./test-stack
-	echo
-	echo testing queue
-	./test-queue
+	./test-heap
 	echo
 
 clean    :
-	rm -f $(OBJS) test-*.o *.o test-stack test-queue test-sll test-dll
+	rm -f $(OBJS) test-*.o *.o test-sll test-dll test-stack test-queue test-bst test-heap heapsort
 
 # Using test server test files
 

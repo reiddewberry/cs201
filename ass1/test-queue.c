@@ -10,7 +10,7 @@ extern long int random(void);
 int
 main(void)
     {
-    srandom(1);
+    srandom(9383);
     QUEUE *p = newQUEUE(displayINTEGER,freeINTEGER);
     enqueue(p,newINTEGER(3));
     enqueue(p,newINTEGER(4));
