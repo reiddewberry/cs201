@@ -3,7 +3,10 @@ OBJSH = integer.h real.h sll.h dll.h stack.h queue.h
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : test-bst test-heap heapsort heap-0-0 heap-0-1 heap-0-2
+all : test-bst test-heap heapsort heap-0-0 heap-0-1 heap-0-2 bst-0-0
+
+bst-0-0 : bst-0-0.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
+	gcc $(LOPTS) bst-0-0.c bst.o queue.o sll.o integer.o -o bst-0-0
 
 test-bst : test-bst.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-bst.c bst.o queue.o sll.o integer.o -o test-bst
@@ -59,17 +62,24 @@ queue.o : queue.c queue.h
 integer.o : integer.c integer.h
 	gcc $(OOPTS) integer.c
 
-valgrind  : test-heap
+valgrind  : test-heap heap-0-0 heap-0-1 heap-0-2
 	echo testing singly-linked list
 	valgrind ./test-heap
+	echo testing singly-linked list
+	valgrind ./heap-0-0
+	echo testing singly-linked list
+	valgrind ./heap-0-1
+	echo testing singly-linked list
+	valgrind ./heap-0-2
 
-test : test-heap
+
+test : test-heap valgrind
 	echo testing doubly-linked list
 	./test-heap
 	echo
 
 clean    :
-	rm -f $(OBJS) test-*.o *.o test-sll test-dll test-stack test-queue test-bst test-heap heapsort
+	rm -f $(OBJS) test-*.o *.o test-sll test-dll test-stack test-queue test-bst test-heap heapsort heap-0-0 heap-0-1 heap-0-2 bst-0-0
 
 # Using test server test files
 

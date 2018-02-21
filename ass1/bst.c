@@ -377,7 +377,6 @@
 
     void displayBSTdebug(BST *tree,FILE *fp){
         if(tree->size == 0){return;}
-        fprintf(fp,"\n");
         levelDisplayBST(tree,fp);
         }
 
