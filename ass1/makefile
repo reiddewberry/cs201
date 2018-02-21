@@ -3,7 +3,7 @@ OBJSH = integer.h real.h sll.h dll.h stack.h queue.h
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : test-bst test-heap heapsort
+all : test-bst test-heap heapsort heap-0-0 heap-0-1 heap-0-2
 
 test-bst : test-bst.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-bst.c bst.o queue.o sll.o integer.o -o test-bst
@@ -13,6 +13,15 @@ test-bst2 : test-bst2.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o intege
 
 test-heap : test-heap.c heap.h bst.h queue.h stack.h sll.h dll.h integer.h heap.o bst.o queue.o stack.o sll.o dll.o integer.o
 	gcc $(LOPTS) test-heap.c heap.o bst.o queue.o stack.o sll.o dll.o integer.o -o test-heap
+
+heap-0-0 : heap-0-0.c heap.h bst.h queue.h stack.h sll.h dll.h integer.h heap.o bst.o queue.o stack.o sll.o dll.o integer.o
+	gcc $(LOPTS) heap-0-0.c heap.o bst.o queue.o stack.o sll.o dll.o integer.o -o heap-0-0
+
+heap-0-1 : heap-0-1.c heap.h bst.h string.h $(OBJSH) heap.o bst.o string.o $(OBJS)
+	gcc $(LOPTS) heap-0-1.c heap.o bst.o string.o $(OBJS) -o heap-0-1
+
+heap-0-2 : heap-0-2.c heap.h bst.h string.h $(OBJSH) heap.o bst.o string.o $(OBJS)
+	gcc $(LOPTS) heap-0-2.c heap.o bst.o string.o $(OBJS) -o heap-0-2
 
 heapsort : heapsort.c heap.h bst.h string.h scanner.h $(OBJSH) heap.o bst.o string.o scanner.o $(OBJS)
 	gcc $(LOPTS) heapsort.c heap.o bst.o $(OBJS) string.o scanner.o -o heapsort
@@ -50,10 +59,9 @@ queue.o : queue.c queue.h
 integer.o : integer.c integer.h
 	gcc $(OOPTS) integer.c
 
-valgrind  : test-bst
+valgrind  : test-heap
 	echo testing singly-linked list
-	valgrind ./test-bst
-
+	valgrind ./test-heap
 
 test : test-heap
 	echo testing doubly-linked list

@@ -343,7 +343,7 @@
 
     void displayBST(BST *tree,FILE *fp){
         preDisplayBST(tree,tree->root,fp);
-        fprintf(fp,"]\n");
+        fprintf(fp,"]");
         }
 
     static void levelDisplayBST(BST *tree,FILE *fp){
@@ -377,6 +377,7 @@
 
     void displayBSTdebug(BST *tree,FILE *fp){
         if(tree->size == 0){return;}
+        fprintf(fp,"\n");
         levelDisplayBST(tree,fp);
         }
 
