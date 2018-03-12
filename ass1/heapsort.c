@@ -21,6 +21,17 @@ char *inputName = NULL; //input filename
 static void processCommandLineArgs(int argc,char **argv);
 static void readFileToHeap(HEAP *sortHeap);
 
+static char *readItem(FILE *fp){
+    if(stringPending(fp)){
+        return readString(fp);
+        }
+    else{
+        return readToken(fp);
+        }
+    }
+
+//static for pint token or string
+
 int main(int argc,char **argv){
     processCommandLineArgs(argc,argv);
     if(version){
@@ -94,6 +105,7 @@ int main(int argc,char **argv){
     }
 
 void processCommandLineArgs(int argc,char **argv){
+    assert(argc > 0);
     if(argc < 3){
         if(argv[1][1] == 'v' && argv[1][0] == '-'){
             version = 1;
@@ -139,6 +151,15 @@ void readFileToHeap(HEAP *sortHeap){
         free(value);
         }
     else if(strSort){
+        STRING *value = newSTRING(readItem(fp));
+        while(!feof(fp)){
+            displaySTRING(value,fp);
+            insertHEAP(sortHeap,value);
+            value = newSTRING(readItem(fp));
+            }
+        free(value);
+
+        /*
         if(stringPending(fp)){
             STRING *value = newSTRING(readString(fp));
             while(!feof(fp)){
@@ -154,7 +175,8 @@ void readFileToHeap(HEAP *sortHeap){
                 value = newSTRING(readToken(fp));
                 }
             free(value);
-            }
+            }*/
+
         }
     else{
         INTEGER *value = newINTEGER(readInt(fp));

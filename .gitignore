@@ -1,3 +1,6 @@
+#valgrind files, vgcore.*s
+vgcore.*
+
 #swap file
 *.swp
 

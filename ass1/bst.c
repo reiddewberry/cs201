@@ -315,10 +315,10 @@
             return;
             }
         //min depth
-        int min = minDepthBST(tree->root);
-        fprintf(fp,"Minimum dpeth: %d\n",min);
+        int min = minDepthBST(tree->root)-1;
+        fprintf(fp,"Minimum depth: %d\n",min);
         //max depth
-        int max = maxDepthBST(tree->root);
+        int max = maxDepthBST(tree->root)-1;
         fprintf(fp,"Maximum depth: %d\n",max);
         }
 

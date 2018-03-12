@@ -33,12 +33,11 @@ setSTRING(STRING *v,char *x)
     return old;
     }
 
-void 
+void
 displaySTRING(void *v,FILE *fp)
     {
     fprintf(fp,"%s",getSTRING((STRING *) v));
     }
-
 
 int
 compareSTRING(void *v,void *w)

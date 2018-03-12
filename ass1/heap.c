@@ -157,7 +157,7 @@
 
     void displayHEAPdebug(HEAP *heap,FILE *fp){
         fprintf(fp,"heap size: %d\n",heap->size);
-        fprintf(fp,"bst size: %d",sizeBST(heap->tree));
+        fprintf(fp,"bst size: %d\n",sizeBST(heap->tree));
         displayBSTdebug(heap->tree,fp);
         }
 

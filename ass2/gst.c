@@ -79,6 +79,7 @@
         if(GSTValFound == 0){
             GSTVALUE *newGSTVal = newGSTVALUE(value,gst->d,gst->c,gst->f);
             insertBST(gst->bst, newGSTVal);
+            gst->size += 1;
             }
         else{
             GSTValFound->count += 1;
@@ -88,17 +89,27 @@
 // NOT DONE
 
     int findGSTcount(GST *gst,void *value){
-        GSTVALUE *GSTVal = getBSTNODEvalue(findBST(gst->bst,));
+        GSTVALUE *GSTVal = getBSTNODEvalue(findBST(gst->bst, value));
         return GSTVal->count;
         }
 
     void *findGST(GST *gst,void *value){
+        GSTVALUE *GSTVal = getBSTNODEvalue(findBST(gst->bst, value));
+        return GSTVal->data;
         }
 
     void *deleteGST(GST *gst,void *value){
-        BSTNODE *delNode = findGSTvalue(gst,value);
-        GSTVALUE *GSTVal = getBSTNODEvalue(delNode);
-        return GSTVal;
+        GSTVALUE *GSTVal = findGST(gst, value);
+        gst->size -= 1;
+        if(GSTVal->count > 1){
+            GSTVal->count -= 1;
+            }
+        else{
+            GSTVal = deleteBST(gst->bst,value);
+            void *storedVal = GSTVal->data;
+            free(GSTVal);
+            return storedVal;
+            }
         }
 
     int sizeGST(GST *gst){
@@ -106,10 +117,14 @@
         }
 
     int duplicates(GST *gst){
-        return 0;
+        int dup = gst->size - sizeBST(gst->bst);
+        return dup;
         }
 
     void statisticsGST(FILE *fp,GST *gst){
+        fprintf(fp,duplicates(gst));
+        fprintf(fp,"\n");
+        statisticsBST(gst->bst,fp);
         }
 
     void displayGST(FILE *fp,GST *gst){
@@ -123,4 +138,6 @@
         }
 
     void freeGST(GST *gst){
+        freeBST(gst->bst);
+        free(gst);
         }
