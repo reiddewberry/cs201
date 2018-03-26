@@ -14,7 +14,7 @@
         }GSTVALUE;
 
     static GSTVALUE *newGSTVALUE(
-        void *data;                          //data passed in
+        void *data,                          //data passed in
         void (*d)(void *,FILE *),            //display
         int (*c)(void *,void *),             //comparator
         void (*f)(void *)){                  //freeing function
@@ -70,7 +70,7 @@
         newGST->display = d;
         newGST->compare = c;
         newGST->free = f;
-        return items;
+        return newGST;
         };
 
 
