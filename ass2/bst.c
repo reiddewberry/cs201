@@ -392,3 +392,62 @@
             }
         free(tree);
         }
+
+
+
+
+
+
+    //Used for AVL tree printing
+    static void aDisplay(BST *tree,FILE *fp){
+        QUEUE *printQ = newQUEUE(0,0);
+        enqueue(printQ,tree->root);
+        BSTNODE *printNode;
+        int lineNum = 0;
+        while(1){
+            int sizeQ = sizeQUEUE(printQ);
+            if(sizeQ == 0){
+                break;
+                }
+            fprintf(fp,"%d: ",lineNum);
+            while(sizeQ > 0){
+                printNode = peekQUEUE(printQ);
+                if(printNode->left == 0 && printNode->right == 0){
+                    fprintf(fp, "=");
+                    }
+                tree->display(printNode->data,fp);
+                fprintf(fp, "(");
+                tree->display(printNode->parent->data,fp);
+                fprintf(fp, ")");
+                if(tree->comp(printNode->parent->data,printNode->data) == 0){
+                    fprintf(fp, "X");
+                    }
+                else if(printNode->parent->left != 0 && tree->comp(printNode->parent->left->data,printNode->data) == 0){
+                    fprintf(fp, "L");
+                    }
+                else{
+                    fprintf(fp, "R");
+                    }
+                dequeue(printQ);
+                if(printNode->left != 0){
+                    enqueue(printQ,printNode->left);
+                    }
+                if(printNode->right != 0){
+                    enqueue(printQ,printNode->right);
+                    }
+                sizeQ -= 1;
+                if(sizeQ > 0){
+                    fprintf(fp," ");
+                    }
+                }
+            fprintf(fp,"\n");
+            lineNum += 1;
+            }
+        freeQUEUE(printQ);
+        }
+
+    //AVL tree printing with decorations
+    void displayBSTdecorated(BST *tree,FILE *fp){
+        if(tree->size == 0){printf("EMPTY\n");}
+        aDisplay(tree, fp);
+        }

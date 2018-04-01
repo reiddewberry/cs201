@@ -24,7 +24,7 @@
         void (*f)(void *)){
         AVLvalue *newVAL = malloc(sizeof(AVLvalue));
         newVAL->data = data;
-        newVAL->count = 1;
+        newVAL->count = 0;
         newVAL->balance = 0;
         newVAL->lheight = 0;
         newVAL->rheight = 0;
@@ -76,9 +76,7 @@
 
     static void freeAVLvalue(void *w){
         AVLvalue *v = w;
-        if(v->free != 0){
-            v->free(getAVLvalueData(v));
-            }
+        v->free(getAVLvalueData(v));
         free(v);
         }
 
@@ -130,7 +128,6 @@
                 }
             }
         else{
-            printf("please no\n");
             AVLvalue *AVLval = getBSTNODEvalue(isthere);
             AVLval->count += 1;
             free(newAVLval);
@@ -164,24 +161,22 @@
 
     void *deleteAVL(AVL *avl,void *data){
         AVLvalue *newAVLval = newAVLvalue(data, avl->display, avl->compare, avl->free);
-        BSTNODE *isthere = findBST(avl->bst, newAVLval);
+        void *isthere = findBST(avl->bst, newAVLval);
         free(newAVLval);
-        AVLvalue *AVLfound = getBSTNODEvalue(isthere);
-        if(AVLfound->count > 1){
-            AVLfound->count -= 1;
+        if(isthere != 0){
+            isthere = swapToLeafBST(avl->bst, isthere);
+            deletionFixUp(avl, isthere);
+            pruneLeafBST(avl->bst, isthere);
+            AVLvalue *prunedAVLval = getBSTNODEvalue(isthere);
+            free(isthere);
+            prunedAVLval->count = 1;
             setBSTsize(avl->bst,sizeBST(avl->bst)-1);
             avl->size -= 1;
+            return prunedAVLval;
+            }
+        else{
             return 0;
             }
-        isthere = swapToLeafBST(avl->bst, isthere);
-        deletionFixUp(avl, isthere);
-        pruneLeafBST(avl->bst, isthere);
-        setBSTsize(avl->bst,sizeBST(avl->bst)-1);
-        avl->size -= 1;
-        void *AVLdata = AVLfound->data;
-        free(isthere);
-        free(AVLfound);
-        return AVLdata;
         }
 
     int sizeAVL(AVL *avl){
@@ -222,15 +217,18 @@
             BSTNODE *p = getBSTNODEparent(fixNode);
             AVLvalue *AVLp = getBSTNODEvalue(p);
             if(compAVLvalue(getBSTNODEvalue(getBSTroot(avl->bst)), AVLv) == 0){
+                printf("case 0\n");
                 return;
                 }
             //Parent favors the sibling
             else if(AVLp->balance != 0 && isNodeFav == -1){
+                printf("case 1\n");
                 setBalance(getBSTNODEparent(fixNode));
                 return;
                 }
             //Parent has no favorite
             else if (AVLp->balance == 0){
+                printf("case 2\n");
                 setBalance(getBSTNODEparent(fixNode));
                 fixNode = getBSTNODEparent(fixNode);
                 //continue looping
@@ -241,6 +239,7 @@
                 // & p = parent of fixNode
                 BSTNODE *y = 0;
                 if(getBSTNODEleft(fixNode) != 0 || getBSTNODEright(fixNode) != 0){
+                printf("case 3\n");
                     if(favChild(fixNode) == 1){
                         y = getBSTNODEleft(fixNode);
                         }
@@ -248,8 +247,9 @@
                         y = getBSTNODEright(fixNode);
                         }
                     }
-                //does y exist and is not p,fixNode,y linear
-                if (y != 0 && isLinear(p,fixNode,y) == 0){
+                //does y exist and is p,fixNode,y linear
+                if (y != 0 && isLinear(p,fixNode,y) == 1){
+                printf("case 4\n");
                     //rotate y to fixNode
                     rotateNode(avl, fixNode, y);
                     //rotate y to p
@@ -260,6 +260,7 @@
                     }
                 //y doesn't exist or isn't linear with p,x
                 else{
+                printf("case 5\n");
                     //rotate fixNode to p
                     rotateNode(avl, p, fixNode);
                     setBalance(p);
@@ -272,27 +273,28 @@
         }
 
     static void deletionFixUp(AVL *avl, BSTNODE *fixNode){
+        AVLvalue *AVLv = getBSTNODEvalue(fixNode);
+        AVLv->height = 0;
+        BSTNODE *p = 0;
+        if(compAVLvalue(getBSTNODEvalue(getBSTroot(avl->bst)), AVLv) != 0){
+            p = getBSTNODEparent(fixNode);
+            }
         while(1){
-            AVLvalue *AVLv = getBSTNODEvalue(fixNode);
-            AVLv->height = 0;
-            BSTNODE *p = getBSTNODEparent(fixNode);
-            AVLvalue *AVLp = getBSTNODEvalue(p);
-            int isNodeFav = favSibling(fixNode);
             if(compAVLvalue(getBSTNODEvalue(getBSTroot(avl->bst)), AVLv) == 0){
                 printf("DELETE - case 0\n");
                 return;
                 }
             //parent favors fixNode
-            else if (AVLp->balance != 0 && favSibling(fixNode) == 1){       //case 1
+            else if (favSibling(fixNode) == 1){                  //case 1
                 printf("DELETE - case 1\n");
                 setBalance(p);
                 fixNode = p;
                 AVLv = getBSTNODEvalue(fixNode);
                 p = getBSTNODEparent(fixNode);
-                AVLp = getBSTNODEvalue(p);
+                continue;
                 }
             //parent has no favorite
-            else if (AVLp->balance == 0){
+            else if (favSibling(fixNode) == 0){
                 printf("DELETE - case 2\n");
                 //setBalance of parent
                 setBalance(p);
@@ -332,8 +334,8 @@
                     fixNode = y;
                     AVLv = getBSTNODEvalue(fixNode);
                     p = getBSTNODEparent(fixNode);
-                    AVLp = getBSTNODEvalue(p);
                     //continue looping
+                    continue;
                     }
                 else{
                 printf("DELETE - case 6\n");
@@ -348,8 +350,8 @@
                     fixNode = z;
                     AVLv = getBSTNODEvalue(fixNode);
                     p = getBSTNODEparent(fixNode);
-                    AVLp = getBSTNODEvalue(p);
                     //continue looping
+                    continue;
                     }
                 }
             }
@@ -541,6 +543,13 @@
         assert(isRight(Node1, Node2) != 0 || isLeft(Node1, Node2) != 0);
         BSTNODE *temp = getBSTNODEparent(Node1);
         if(isRight(Node1, Node2)){
+            //Check to see if Node1 is its parents left or right
+            if(isRight(temp, Node1)){
+                setBSTNODEright(temp, Node2);
+                }
+            else{
+                setBSTNODEleft(temp, Node2);
+                }
             //check to see if Node1 is the root
             if(compAVLvalue(getBSTNODEvalue(temp), getBSTNODEvalue(Node1)) == 0){
                 setBSTNODEparent(Node1, Node2);
@@ -548,46 +557,31 @@
                 setBSTroot(avl->bst, Node2);
                 }
             else{
-                //Check to see if Node1 is its parents left or right
-                if(isRight(temp, Node1)){
-                    setBSTNODEright(temp, Node2);
-                    }
-                else{
-                    setBSTNODEleft(temp, Node2);
-                    }
                 setBSTNODEparent(Node1, Node2);
                 setBSTNODEparent(Node2, temp);
                 }
             setBSTNODEright(Node1, getBSTNODEleft(Node2));
-            if(getBSTNODEleft(Node2) != 0){
-                setBSTNODEparent(getBSTNODEleft(Node2),Node1);
-                }
             setBSTNODEleft(Node2, Node1);
             return;
             }
         else{
+            if(isRight(temp, Node1)){
+                setBSTNODEright(temp, Node2);
+                }
+            else{
+                setBSTNODEleft(temp, Node2);
+                }
             //is root
             if(compAVLvalue(getBSTNODEvalue(temp), getBSTNODEvalue(Node1)) == 0){
-                printf("check");
                 setBSTNODEparent(Node1, Node2);
                 setBSTNODEparent(Node2, Node2);
                 setBSTroot(avl->bst, Node2);
                 }
             else{
-                //Check to see if Node1 is its parents left or right
-                if(isRight(temp, Node1)){
-                    setBSTNODEright(temp, Node2);
-                    }
-                else{
-                    setBSTNODEleft(temp, Node2);
-                    }
                 setBSTNODEparent(Node1, Node2);
                 setBSTNODEparent(Node2, temp);
                 }
             setBSTNODEleft(Node1, getBSTNODEright(Node2));
-            if(getBSTNODEright(Node2) != 0){
-                setBSTNODEparent(getBSTNODEright(Node2),Node1);
-                }
             setBSTNODEright(Node2, Node1);
             return;
             }

@@ -36,4 +36,5 @@
     extern void    displayBST(BST *t,FILE *fp);
     extern void    displayBSTdebug(BST *t,FILE *fp);
     extern void    freeBST(BST *t);
+    extern void    displayBSTdecorated(BST *t,FILE *fp);
     #endif
