@@ -37,7 +37,6 @@
 
     static void *getAVLvalueData(AVLvalue *v){return v->data;}
     static int getAVLvalueCount(AVLvalue *v){return v->count;}
-    static int getAVLvalueBalance(AVLvalue *v){return v->balance;}
 
     //To be used, private
     static int setBalance(BSTNODE *);
@@ -296,7 +295,6 @@
         AVLv->height = 0;
         BSTNODE *p = getBSTNODEparent(fixNode);
         AVLvalue *AVLp = getBSTNODEvalue(p);
-        int isNodeFav = favSibling(fixNode);
         while(1){
             AVLv = getBSTNODEvalue(fixNode);
             p = getBSTNODEparent(fixNode);
@@ -439,7 +437,6 @@
         BSTNODE *NodeSibling = sibling(Node);
         if(NodeSibling != 0){
             AVLvalue *AVLsib = getBSTNODEvalue(NodeSibling);
-            AVLvalue *AVLnode = getBSTNODEvalue(Node);
             BSTNODE *par = getBSTNODEparent(Node);
             AVLvalue *AVLpar = getBSTNODEvalue(par);
             if(AVLpar->balance == 1 && compAVLvalue(AVLsib,getBSTNODEvalue(getBSTNODEleft(par))) == 0){
@@ -507,7 +504,7 @@
                     }
                 }
             //is x to the right
-            if(compAVLvalue(getBSTNODEvalue(getBSTNODEright(p)), AVLx) == 0){
+            else if(compAVLvalue(getBSTNODEvalue(getBSTNODEright(p)), AVLx) == 0){
                 if(getBSTNODEright(x) != 0){
                     if(compAVLvalue(getBSTNODEvalue(getBSTNODEright(x)),AVLy) == 0){
                         return 1;
@@ -517,6 +514,10 @@
                 else{
                     return 0;
                     }
+                }
+            else{
+                fprintf(stderr, "ERROR: issues with isLinear");
+                exit(-1);
                 }
             }
         }

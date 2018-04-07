@@ -3,7 +3,10 @@ OBJSH = integer.h real.h sll.h dll.h stack.h queue.h
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : gst-1-0 avl-1-0
+all : gst-1-0 avl-1-0 trees
+
+trees : trees.c scanner.h avl.h gst.h bst.h queue.h sll.h string.h scanner.o avl.o gst.o bst.o queue.o sll.o string.o
+	gcc $(LOPTS) trees.c scanner.o avl.o gst.o bst.o queue.o sll.o string.o -o trees
 
 gst-1-0 : gst-1-0.c gst.h bst.h queue.h sll.h integer.h gst.o bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) gst-1-0.c gst.o bst.o queue.o sll.o integer.o -o gst-1-0
@@ -31,6 +34,12 @@ test-stack : test-stack.c stack.h integer.h dll.o integer.o stack.o
 
 test-queue : test-queue.c integer.h sll.o queue.o integer.o
 	gcc $(LOPTS) test-queue.c integer.o sll.o queue.o -o test-queue
+
+avl.o : avl.c avl.h
+	gcc $(OOPTS) avl.c
+
+gst.o : gst.c gst.h
+	gcc $(OOPTS) gst.c
 
 heap.o : heap.c heap.h
 	gcc $(OOPTS) heap.c
@@ -72,7 +81,7 @@ test : gst-1-0
 	echo
 
 clean    :
-	rm -f $(OBJS) test-*.o *.o test-sll test-dll test-stack test-queue test-bst test-heap heapsort gst-1-0 avl-1-0
+	rm -f $(OBJS) test-*.o *.o test-sll test-dll test-stack test-queue test-bst test-heap heapsort gst-1-0 avl-1-0 trees
 
 # Using test server test files
 
