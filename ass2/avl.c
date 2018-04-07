@@ -79,7 +79,7 @@
         if(v->free != 0){
             v->free(getAVLvalueData(v));
             }
-        free(v);
+        free(w);
         }
 
     static void AVLswap(BSTNODE *a, BSTNODE *b){
@@ -154,10 +154,10 @@
 
     int findAVLcount(AVL *avl,void *data){
         AVLvalue *newAVLval = newAVLvalue(data, avl->display, avl->compare, avl->free);
-        void *isthere = findBST(avl->bst, newAVLval);
+        BSTNODE *isthere = findBST(avl->bst, newAVLval);
         free(newAVLval);
         if(isthere != 0){
-            return getAVLvalueCount(isthere);
+            return getAVLvalueCount(getBSTNODEvalue(isthere));
             }
         else{
             return 0;
@@ -166,10 +166,10 @@
 
     void *findAVL(AVL *avl,void *data){
         AVLvalue *newAVLval = newAVLvalue(data, avl->display, avl->compare, avl->free);
-        void *isthere = findBST(avl->bst, newAVLval);
+        BSTNODE *isthere = findBST(avl->bst, newAVLval);
         free(newAVLval);
         if(isthere != 0){
-            return getAVLvalueData(isthere);
+            return getAVLvalueData(getBSTNODEvalue(isthere));
             }
         else{
             return 0;
@@ -179,24 +179,27 @@
     void *deleteAVL(AVL *avl,void *data){
         AVLvalue *newAVLval = newAVLvalue(data, avl->display, avl->compare, avl->free);
         BSTNODE *isthere = findBST(avl->bst, newAVLval);
-        printf("\n\nNOW Deleting : ");
-        displayAVLvalue(newAVLval, stdout);
-        printf("\n");
-   /*here*/      free(newAVLval);
+        free(newAVLval);
+        if(isthere == 0){
+            return 0;
+            }
         AVLvalue *AVLfound = getBSTNODEvalue(isthere);
+
+        //WHERE DOES IT CHANGEQWAWRDIAGKFHDGJKG
         if(AVLfound->count > 1){
             AVLfound->count -= 1;
             avl->size -= 1;
             return 0;
             }
         isthere = swapToLeafBST(avl->bst, isthere);
-        AVLfound->height = 0;
         deletionFixUp(avl, isthere);
         pruneLeafBST(avl->bst, isthere);
-        setBSTsize(avl->bst,sizeBST(avl->bst)-1);
+        setBSTsize(avl->bst, sizeBST(avl->bst)-1);
         avl->size -= 1;
+
+        AVLfound = getBSTNODEvalue(isthere);
         void *AVLdata = AVLfound->data;
-        //free(AVLfound);
+        free(AVLfound);
         free(isthere);
         return AVLdata;
         }
@@ -291,32 +294,23 @@
     static void deletionFixUp(AVL *avl, BSTNODE *fixNode){
         AVLvalue *AVLv = getBSTNODEvalue(fixNode);
         AVLv->height = 0;
+        BSTNODE *p = getBSTNODEparent(fixNode);
+        AVLvalue *AVLp = getBSTNODEvalue(p);
+        int isNodeFav = favSibling(fixNode);
         while(1){
-            AVLvalue *AVLv = getBSTNODEvalue(fixNode);
-            BSTNODE *p = getBSTNODEparent(fixNode);
-            AVLvalue *AVLp = getBSTNODEvalue(p);
-            int isNodeFav = favSibling(fixNode);
-    printf("p balance: %d\nisNodeFav: %d (1=yes)\n", AVLp->balance, isNodeFav);
-    displayAVLvalue(AVLp,stdout);
-            printf("\n");
-    displayAVLvalue(AVLv,stdout);
-            printf("\n");
+            AVLv = getBSTNODEvalue(fixNode);
+            p = getBSTNODEparent(fixNode);
+            AVLp = getBSTNODEvalue(p);
             if(compAVLvalue(getBSTNODEvalue(getBSTroot(avl->bst)), AVLv) == 0){
-    printf("DELETE - case 0\n");
                 return;
                 }
             //parent favors fixNode
             else if (favSibling(fixNode) == 1){       //case 1
-    printf("DELETE - case 1\n");
                 setBalance(p);
                 fixNode = p;
-                AVLv = getBSTNODEvalue(fixNode);
-                p = getBSTNODEparent(fixNode);
-                AVLp = getBSTNODEvalue(p);
                 }
             //parent has no favorite
             else if (AVLp->balance == 0){
-    printf("DELETE - case 2\n");
                 //setBalance of parent
                 setBalance(p);
                 return;
@@ -329,28 +323,17 @@
                 //y = the favorite child of z
                 int side = favChild(z);
                 if(side == 1){
-    printf("DELETE - case 3\n");
                     y = getBSTNODEleft(z);
                     }
                 else if(side == -1){
-    printf("DELETE - case 4\n");
                     y = getBSTNODEright(z);
                     }
                 //if there is no favorite or no children
                 else{
-    printf("DELETE - case 5\n");
                     y = 0;
                     }
                 //if y exists && y,z,p are not linear
-    printf("p is:   ");
-    displayAVLvalue(AVLp,stdout);
-    printf("\nz is:   ");
-    displayAVLvalue(getBSTNODEvalue(z),stdout);
-    printf("\ny is:   ");
-    displayAVLvalue(getBSTNODEvalue(y),stdout);
-    printf("\n");
                 if (y != 0 && isLinear(p,z,y) == 0){
-    printf("DELETE - case 6\n");
                     //rotate y to z
                     rotateNode(avl, z, y);
                     rotateNode(avl, p, y);
@@ -360,13 +343,9 @@
                     setBalance(y);
                     //fixNode = y
                     fixNode = y;
-                    AVLv = getBSTNODEvalue(fixNode);
-                    p = getBSTNODEparent(fixNode);
-                    AVLp = getBSTNODEvalue(p);
                     //continue looping
                     }
                 else{
-    printf("DELETE - case 7\n");
                     //rotate z to p                      //case 4
                     rotateNode(avl, p, z);
                     //set the balances
@@ -376,9 +355,6 @@
                         return;
                         }
                     fixNode = z;
-                    AVLv = getBSTNODEvalue(fixNode);
-                    p = getBSTNODEparent(fixNode);
-                    AVLp = getBSTNODEvalue(p);
                     //continue looping
                     }
                 }
@@ -531,7 +507,7 @@
                     }
                 }
             //is x to the right
-            if(compAVLvalue(getBSTNODEvalue(getBSTNODEleft(p)), AVLx) == 0){
+            if(compAVLvalue(getBSTNODEvalue(getBSTNODEright(p)), AVLx) == 0){
                 if(getBSTNODEright(x) != 0){
                     if(compAVLvalue(getBSTNODEvalue(getBSTNODEright(x)),AVLy) == 0){
                         return 1;

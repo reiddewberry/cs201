@@ -132,8 +132,9 @@
                 return 0;
                 }
             else{
-                deleteBST(gst->bst, GSTval);
+                isthere = deleteBST(gst->bst, GSTval);
                 void *data = GSTval->data;
+                free(isthere);
                 free(GSTval);
                 gst->size -= 1;
                 return data;

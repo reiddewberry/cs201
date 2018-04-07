@@ -43,15 +43,10 @@ main(void)
         int j = random() % 16;
         INTEGER *a = newINTEGER(j);
         int count = findAVLcount(p,a);
-        if (count == 1){
+        if (count == 1)
             freeINTEGER(deleteAVL(p,a));
-        displayAVL(p,stdout);
-            }
-        else if (count > 1){
+        else if (count > 1)
             deleteAVL(p,a);
-        displayAVL(p,stdout);
-            }
-        printf("\n");
         freeINTEGER(a);
         }
     if (sizeAVL(p) < 200)

@@ -31,7 +31,6 @@ main(void)
     printf(" present? %s\n",findAVL(p,q) == 0? "no" : "yes");
     INTEGER *r = newINTEGER(3);
     freeINTEGER(deleteAVL(p,r));
-    //deleteAVL(p,r);
     statisticsAVL(p,stdout);
     printf("AVL:\n");
     displayAVL(p,stdout);
@@ -43,7 +42,6 @@ main(void)
     printf(" present? %s\n",findAVL(p,q) == 0? "no" : "yes");
     setINTEGER(r,2);
     freeINTEGER(deleteAVL(p,r));
-    //deleteAVL(p,r);
     statisticsAVL(p,stdout);
     printf("AVL:\n");
     displayAVL(p,stdout);
