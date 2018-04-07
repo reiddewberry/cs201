@@ -13,13 +13,13 @@ long int random(void);
 int
 main(void)
     {
-    srandom(1037);
-    //INTEGER test of AVL, nominal size is 15
+    srandom(1038);
+    //INTEGER test of AVL, nominal size is 16
     int i;
     AVL *p = newAVL(displayINTEGER,compareINTEGER,freeINTEGER);
-    for (i = 0; i < 15; ++i)
+    for (i = 0; i < 16; ++i)
         {
-        int j = random() % 15;
+        int j = random() % 16;
         INTEGER *a = newINTEGER(j);
         if (findAVL(p,a) == 0)
             insertAVL(p,a);
@@ -28,6 +28,31 @@ main(void)
             insertAVL(p,a);
             freeINTEGER(a);
             }
+        }
+    if (sizeAVL(p) < 200)
+        {
+        printf("AVL:\n");
+        displayAVL(p,stdout);
+        printf("debug: ");
+        displayAVLdebug(p,stdout);
+        printf("\n");
+        }
+    printf("size is %d\n",sizeAVL(p));
+    for (i = 0; i < 16; ++i)
+        {
+        int j = random() % 16;
+        INTEGER *a = newINTEGER(j);
+        int count = findAVLcount(p,a);
+        if (count == 1){
+            freeINTEGER(deleteAVL(p,a));
+        displayAVL(p,stdout);
+            }
+        else if (count > 1){
+            deleteAVL(p,a);
+        displayAVL(p,stdout);
+            }
+        printf("\n");
+        freeINTEGER(a);
         }
     if (sizeAVL(p) < 200)
         {

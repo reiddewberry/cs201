@@ -6,7 +6,7 @@
     typedef struct gst GST;
 
     extern GST *newGST(
-        void (*)(FILE *,void *),            //display
+        void (*)(void *,FILE *),            //display
         int (*)(void *,void *),             //comparator
         void (*)(void *));                  //freeing function
     extern void insertGST(GST *,void *);
@@ -15,9 +15,9 @@
     extern void *deleteGST(GST *,void *);
     extern int sizeGST(GST *);
     extern int duplicates(GST *);
-    extern void statisticsGST(FILE *,GST *);
-    extern void displayGST(FILE *,GST *);
-    extern void displayGSTdebug(FILE *,GST *);
+    extern void statisticsGST(GST *,FILE *);
+    extern void displayGST(GST *, FILE *);
+    extern void displayGSTdebug(GST *, FILE *);
     extern void freeGST(GST *);
 
     #endif

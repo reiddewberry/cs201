@@ -8,17 +8,17 @@
     typedef struct gstvalue{
         void *data;
         int count;
-        void (*display)(FILE *,void *);
-        void (*compare)(void *,void *);
+        void (*display)(void *,FILE *);
+        int (*compare)(void *,void *);
         void (*free)(void *);
-        }GSTVALUE;
+        }GSTvalue;
 
-    static GSTVALUE *newGSTVALUE(
+    static GSTvalue *newGSTvalue(
         void *data,                          //data passed in
         void (*d)(void *,FILE *),            //display
         int (*c)(void *,void *),             //comparator
         void (*f)(void *)){                  //freeing function
-        GSTVALUE *newVAL = malloc(sizeof(GSTVALUE));
+        GSTvalue *newVAL = malloc(sizeof(GSTvalue));
         newVAL->data = data;
         newVAL->count = 1;
         newVAL->display = d;
@@ -27,26 +27,28 @@
         return newVAL;
         };
 
-    static void *getGSTVvalue(GSTVALUE *v){return v->data;}
+    static void *getGSTvalue(GSTvalue *v){return v->data;}
+    static int getGSTcount(GSTvalue *v){return v->count;}
 
-    static int getGSTVcount(GSTVALUE *v){return v->count;}
-
-    static void diplayGSTV(GSTVALUE *v, FILE *fp){
-        GSTVALUE *w = v;
-        w->display(getGSTVvalue(w), fp);
-        if(getGSTVcount(w) > 1){
-            fprintf(fp, getGSTVcount(w));
+    static void displayGSTV(void *v, FILE *fp){
+        GSTvalue *w = v;
+        w->display(w->data, fp);
+        if(w->count > 1){
+            fprintf(fp,"[%d]", getGSTcount(w));
             }
         }
 
     static int compGSTV(void *w, void *x){
-        GSTVALUE *a = x;
-        return a->compare(w, getGSTVvalue(a));
+        GSTvalue *a = w;
+        GSTvalue *b = x;
+        return a->compare(a->data, b->data);
         }
 
     static void freeGSTV(void *v){
-        GSTVALUE *w = v;
-        w->free(getGSTVvalue(w));
+        GSTvalue *w = v;
+        if(w->free != 0){
+            w->free(getGSTvalue(w));
+            }
         free(w);
         }
 
@@ -55,9 +57,9 @@
         BST *bst;
         int size;
         void (*display)(void *,FILE *);
-        void (*compare)(void *,void *);
+        int (*compare)(void *,void *);
         void (*free)(void *);
-        }GST
+        }GST;
 
     GST *newGST(
         void (*d)(void *,FILE *),            //display
@@ -75,66 +77,93 @@
 
 
     void insertGST(GST *gst,void *value){
-        GSTVALUE *GSTValFound = findBST(gst->bst, value);
-        if(GSTValFound == 0){
-            GSTVALUE *newGSTVal = newGSTVALUE(value,gst->d,gst->c,gst->f);
-            insertBST(gst->bst, newGSTVal);
-            gst->size += 1;
+        GSTvalue *newGSTval = newGSTvalue(value, gst->display, gst->compare, gst->free);
+        BSTNODE *isthere = findBST(gst->bst, newGSTval);
+        if(isthere == 0){
+            insertBST(gst->bst, newGSTval);
+            BSTNODE *root = getBSTroot(gst->bst);
+            if(sizeBST(gst->bst) == 1){
+                setBSTNODEparent(root, root);
+                }
             }
         else{
-            GSTValFound->count += 1;
+            free(newGSTval);
+            GSTvalue *GSTval = getBSTNODEvalue(isthere);
+            GSTval->count += 1;
             }
+        gst->size += 1;
         }
 
-// NOT DONE
-
     int findGSTcount(GST *gst,void *value){
-        GSTVALUE *GSTVal = getBSTNODEvalue(findBST(gst->bst, value));
-        return GSTVal->count;
+        GSTvalue *newGSTval = newGSTvalue(value, gst->display, gst->compare, gst->free);
+        BSTNODE *isthere = findBST(gst->bst, newGSTval);
+        free(newGSTval);
+        if(isthere == 0){
+            return 0;
+            }
+        else{
+            GSTvalue *GSTval = getBSTNODEvalue(isthere);
+            return GSTval->count;
+            }
         }
 
     void *findGST(GST *gst,void *value){
-        GSTVALUE *GSTVal = getBSTNODEvalue(findBST(gst->bst, value));
-        return GSTVal->data;
+        GSTvalue *newGSTval = newGSTvalue(value, gst->display, gst->compare, gst->free);
+        BSTNODE *isthere = findBST(gst->bst, newGSTval);
+        free(newGSTval);
+        if(isthere == 0){
+            return 0;
+            }
+        else{
+            GSTvalue *GSTval = getBSTNODEvalue(isthere);
+            return GSTval->data;
+            }
         }
 
     void *deleteGST(GST *gst,void *value){
-        GSTVALUE *GSTVal = findGST(gst, value);
-        gst->size -= 1;
-        if(GSTVal->count > 1){
-            GSTVal->count -= 1;
+        GSTvalue *newGSTval = newGSTvalue(value, gst->display, gst->compare, gst->free);
+        BSTNODE *isthere = findBST(gst->bst, newGSTval);
+        free(newGSTval);
+        if(isthere != 0){
+            GSTvalue *GSTval = getBSTNODEvalue(isthere);
+            if(GSTval->count > 1){
+                GSTval->count -= 1;
+                gst->size -= 1;
+                return 0;
+                }
+            else{
+                deleteBST(gst->bst, GSTval);
+                void *data = GSTval->data;
+                free(GSTval);
+                gst->size -= 1;
+                return data;
+                }
             }
         else{
-            GSTVal = deleteBST(gst->bst,value);
-            void *storedVal = GSTVal->data;
-            free(GSTVal);
-            return storedVal;
+            return 0;
             }
         }
 
     int sizeGST(GST *gst){
-        return gst->size;
+        return sizeBST(gst->bst);
         }
 
-    int duplicates(GST *gst){
+    int duplicatesGST(GST *gst){
         int dup = gst->size - sizeBST(gst->bst);
         return dup;
         }
 
-    void statisticsGST(FILE *fp,GST *gst){
-        fprintf(fp,duplicates(gst));
-        fprintf(fp,"\n");
+    void statisticsGST(GST *gst,FILE *fp){
+        fprintf(fp,"Duplicates: %d\n", duplicatesGST(gst));
         statisticsBST(gst->bst,fp);
         }
 
-    void displayGST(FILE *fp,GST *gst){
-        if(gst->size == 0){
-            fprintf(fp,"EMPTY");
-            return;
-            }
+    void displayGST(GST *gst,FILE *fp){
+        displayBSTdecorated(gst->bst, fp);
         }
 
-    void displayGSTdebug(FILE *fp,GST *gst){
+    void displayGSTdebug(GST *gst,FILE *fp){
+        displayBST(gst->bst, fp);
         }
 
     void freeGST(GST *gst){

@@ -3,13 +3,23 @@ OBJSH = integer.h real.h sll.h dll.h stack.h queue.h
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : test-bst test-heap heapsort test-avl test-avl3
+all : test-bst test-heap heapsort test-avl test-avl3 test-avl4 test-avl5 test-avl9
 
 test-avl : test-avl.c avl.h bst.h queue.h sll.h integer.h avl.o bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-avl.c avl.o bst.o queue.o sll.o integer.o -o test-avl
 
 test-avl3 : test-avl3.c avl.h bst.h queue.h sll.h integer.h avl.o bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-avl3.c avl.o bst.o queue.o sll.o integer.o -o test-avl3
+
+test-avl4 : test-avl4.c avl.h bst.h queue.h sll.h integer.h avl.o bst.o queue.o sll.o integer.o
+	gcc $(LOPTS) test-avl4.c avl.o bst.o queue.o sll.o integer.o -o test-avl4
+
+test-avl5 : test-avl5.c avl.h bst.h queue.h sll.h integer.h avl.o bst.o queue.o sll.o integer.o
+	gcc $(LOPTS) test-avl5.c avl.o bst.o queue.o sll.o integer.o -o test-avl5
+
+test-avl9 : test-avl9.c avl.h bst.h queue.h sll.h integer.h avl.o bst.o queue.o sll.o integer.o
+	gcc $(LOPTS) test-avl9.c avl.o bst.o queue.o sll.o integer.o -o test-avl9
+
 
 test-bst : test-bst.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-bst.c bst.o queue.o sll.o integer.o -o test-bst
@@ -72,7 +82,7 @@ test : test-heap
 	echo
 
 clean    :
-	rm -f $(OBJS) test-*.o *.o test-sll test-dll test-stack test-queue test-bst test-heap heapsort heap-0-0 heap-0-1 heap-0-2 bst-0-0
+	rm -f $(OBJS) test-*.o *.o test-sll test-dll test-stack test-queue test-bst test-heap heapsort test-avl test-avl3 test-avl4 test-avl5 test-avl9
 
 # Using test server test files
 

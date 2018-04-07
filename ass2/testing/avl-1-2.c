@@ -13,24 +13,24 @@ long int random(void);
 int
 main(void)
     {
-    srandom(1034);
-    //simple INTEGER test of AVL
-    AVL *p = newAVL(displayINTEGER,compareINTEGER,freeINTEGER);
-    insertAVL(p,newINTEGER(2));
-    insertAVL(p,newINTEGER(3));
-    insertAVL(p,newINTEGER(1));
+    srandom(1036);
+    //simple STRING test of AVL
+    AVL *p = newAVL(displaySTRING,compareSTRING,freeSTRING);
+    insertAVL(p,newSTRING("a2"));
+    insertAVL(p,newSTRING("a3"));
+    insertAVL(p,newSTRING("a1"));
     statisticsAVL(p,stdout);
     printf("AVL:\n");
     displayAVL(p,stdout);
     printf("debug: ");
     displayAVLdebug(p,stdout);
     printf("\n");
-    INTEGER *q = newINTEGER(2);
+    STRING *q = newSTRING("a2");
     printf("is ");
-    displayINTEGER(q,stdout);
+    displaySTRING(q,stdout);
     printf(" present? %s\n",findAVL(p,q) == 0? "no" : "yes");
-    INTEGER *r = newINTEGER(3);
-    freeINTEGER(deleteAVL(p,r));
+    STRING *r = newSTRING("a3");
+    freeSTRING(deleteAVL(p,r));
     statisticsAVL(p,stdout);
     printf("AVL:\n");
     displayAVL(p,stdout);
@@ -38,10 +38,10 @@ main(void)
     displayAVLdebug(p,stdout);
     printf("\n");
     printf("is ");
-    displayINTEGER(q,stdout);
+    displaySTRING(q,stdout);
     printf(" present? %s\n",findAVL(p,q) == 0? "no" : "yes");
-    setINTEGER(r,2);
-    freeINTEGER(deleteAVL(p,r));
+    setSTRING(r,"a2");
+    freeSTRING(deleteAVL(p,r));
     statisticsAVL(p,stdout);
     printf("AVL:\n");
     displayAVL(p,stdout);
@@ -49,11 +49,11 @@ main(void)
     displayAVLdebug(p,stdout);
     printf("\n");
     printf("is ");
-    displayINTEGER(q,stdout);
+    displaySTRING(q,stdout);
     printf(" present? %s\n",findAVL(p,q) == 0? "no" : "yes");
     printf("size: %d\n",sizeAVL(p));
-    freeINTEGER(q);
-    freeINTEGER(r);
+    freeSTRING(q);
+    freeSTRING(r);
     freeAVL(p);
     return 0;
     }

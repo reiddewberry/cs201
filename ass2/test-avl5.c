@@ -13,13 +13,13 @@ long int random(void);
 int
 main(void)
     {
-    srandom(1037);
-    //INTEGER test of AVL, nominal size is 15
+    srandom(1039);
+    //INTEGER test of AVL, nominal size is 101
     int i;
     AVL *p = newAVL(displayINTEGER,compareINTEGER,freeINTEGER);
-    for (i = 0; i < 15; ++i)
+    for (i = 0; i < 101; ++i)
         {
-        int j = random() % 15;
+        int j = random() % 101;
         INTEGER *a = newINTEGER(j);
         if (findAVL(p,a) == 0)
             insertAVL(p,a);

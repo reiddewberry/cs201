@@ -245,7 +245,7 @@
         if(leafNode->right != 0){
             leafNode = getSuccessor(tree,leafNode);
             }
-        if(leafNode->left != 0){
+        else if(leafNode->left != 0){
             leafNode = getPredecessor(tree,leafNode);
             }
         return leafNode;

@@ -18,12 +18,12 @@
         }AVLvalue;
 
     static AVLvalue *newAVLvalue(
-        void *data,
+        void *value,
         void (*d)(void *,FILE *),           //display
         int (*c)(void *w,void *v),            //comparator
         void (*f)(void *)){
         AVLvalue *newVAL = malloc(sizeof(AVLvalue));
-        newVAL->data = data;
+        newVAL->data = value;
         newVAL->count = 1;
         newVAL->balance = 0;
         newVAL->lheight = 0;
@@ -82,13 +82,30 @@
         free(v);
         }
 
+    static void AVLswap(BSTNODE *a, BSTNODE *b){
+        AVLvalue *ta = getBSTNODEvalue(a);
+        AVLvalue *tb = getBSTNODEvalue(b);
+
+        /* swap the values stored in the AVL value objects */
+        void *vtemp = ta->data;
+        ta->data = tb->data;
+        tb->data = vtemp;
+
+        /* swap the counts stored in the AVL value objects */
+        int ctemp = ta->count;
+        ta->count = tb->count;
+        tb->count = ctemp;
+
+        /* note: AVL heights and balance factors are NOT swapped */
+        }
+
 /*PUBLIC*/
     typedef struct avl{
         BST *bst;
         int size;
         void (*display)(void *,FILE *);
         int (*compare)(void *,void *);
-        void (*free)(void*);
+        void (*free)(void *);
         }AVL;
 
     AVL *newAVL(
@@ -97,7 +114,7 @@
         void (*f)(void *)){
         AVL *newAVL = malloc(sizeof(AVL));
         assert(newAVL != 0);
-        newAVL->bst = newBST(displayAVLvalue,compAVLvalue,0,freeAVLvalue);
+        newAVL->bst = newBST(displayAVLvalue,compAVLvalue,AVLswap,freeAVLvalue);
         newAVL->size = 0;
         newAVL->display = d;
         newAVL->compare = c;
@@ -110,8 +127,6 @@
     static void deletionFixUp(AVL *, BSTNODE *);
     static void rotateNode(AVL *, BSTNODE *, BSTNODE *);
 
-    //IDK AHH
-    //static void adisplay(AVL *,FILE *);
 
 //ALL FUNCTIONS
 
@@ -130,10 +145,9 @@
                 }
             }
         else{
-            printf("please no\n");
+            free(newAVLval);
             AVLvalue *AVLval = getBSTNODEvalue(isthere);
             AVLval->count += 1;
-            free(newAVLval);
             }
         avl->size += 1;
         }
@@ -165,22 +179,25 @@
     void *deleteAVL(AVL *avl,void *data){
         AVLvalue *newAVLval = newAVLvalue(data, avl->display, avl->compare, avl->free);
         BSTNODE *isthere = findBST(avl->bst, newAVLval);
-        free(newAVLval);
+        printf("\n\nNOW Deleting : ");
+        displayAVLvalue(newAVLval, stdout);
+        printf("\n");
+   /*here*/      free(newAVLval);
         AVLvalue *AVLfound = getBSTNODEvalue(isthere);
         if(AVLfound->count > 1){
             AVLfound->count -= 1;
-            setBSTsize(avl->bst,sizeBST(avl->bst)-1);
             avl->size -= 1;
             return 0;
             }
         isthere = swapToLeafBST(avl->bst, isthere);
+        AVLfound->height = 0;
         deletionFixUp(avl, isthere);
         pruneLeafBST(avl->bst, isthere);
         setBSTsize(avl->bst,sizeBST(avl->bst)-1);
         avl->size -= 1;
         void *AVLdata = AVLfound->data;
+        //free(AVLfound);
         free(isthere);
-        free(AVLfound);
         return AVLdata;
         }
 
@@ -272,19 +289,25 @@
         }
 
     static void deletionFixUp(AVL *avl, BSTNODE *fixNode){
+        AVLvalue *AVLv = getBSTNODEvalue(fixNode);
+        AVLv->height = 0;
         while(1){
             AVLvalue *AVLv = getBSTNODEvalue(fixNode);
-            AVLv->height = 0;
             BSTNODE *p = getBSTNODEparent(fixNode);
             AVLvalue *AVLp = getBSTNODEvalue(p);
             int isNodeFav = favSibling(fixNode);
+    printf("p balance: %d\nisNodeFav: %d (1=yes)\n", AVLp->balance, isNodeFav);
+    displayAVLvalue(AVLp,stdout);
+            printf("\n");
+    displayAVLvalue(AVLv,stdout);
+            printf("\n");
             if(compAVLvalue(getBSTNODEvalue(getBSTroot(avl->bst)), AVLv) == 0){
-                printf("DELETE - case 0\n");
+    printf("DELETE - case 0\n");
                 return;
                 }
             //parent favors fixNode
-            else if (AVLp->balance != 0 && favSibling(fixNode) == 1){       //case 1
-                printf("DELETE - case 1\n");
+            else if (favSibling(fixNode) == 1){       //case 1
+    printf("DELETE - case 1\n");
                 setBalance(p);
                 fixNode = p;
                 AVLv = getBSTNODEvalue(fixNode);
@@ -293,7 +316,7 @@
                 }
             //parent has no favorite
             else if (AVLp->balance == 0){
-                printf("DELETE - case 2\n");
+    printf("DELETE - case 2\n");
                 //setBalance of parent
                 setBalance(p);
                 return;
@@ -302,25 +325,32 @@
             else{
                 //z = sibling of fixNode
                 BSTNODE *z = sibling(fixNode); //Might need to make these before while(1)
+                BSTNODE *y = z;
                 //y = the favorite child of z
-                BSTNODE *y = 0;
                 int side = favChild(z);
                 if(side == 1){
-                printf("DELETE - case 3\n");
+    printf("DELETE - case 3\n");
                     y = getBSTNODEleft(z);
                     }
                 else if(side == -1){
-                printf("DELETE - case 4\n");
+    printf("DELETE - case 4\n");
                     y = getBSTNODEright(z);
                     }
                 //if there is no favorite or no children
                 else{
-                printf("DELETE - case 5\n");
-                    int y = 0;
+    printf("DELETE - case 5\n");
+                    y = 0;
                     }
                 //if y exists && y,z,p are not linear
-                if (y != 0 && isLinear(p,z,y) == 1){
-                printf("DELETE - case 0\n");
+    printf("p is:   ");
+    displayAVLvalue(AVLp,stdout);
+    printf("\nz is:   ");
+    displayAVLvalue(getBSTNODEvalue(z),stdout);
+    printf("\ny is:   ");
+    displayAVLvalue(getBSTNODEvalue(y),stdout);
+    printf("\n");
+                if (y != 0 && isLinear(p,z,y) == 0){
+    printf("DELETE - case 6\n");
                     //rotate y to z
                     rotateNode(avl, z, y);
                     rotateNode(avl, p, y);
@@ -336,7 +366,7 @@
                     //continue looping
                     }
                 else{
-                printf("DELETE - case 6\n");
+    printf("DELETE - case 7\n");
                     //rotate z to p                      //case 4
                     rotateNode(avl, p, z);
                     //set the balances
@@ -363,7 +393,9 @@
         if(leftNode != 0){
             AVLv->lheight = getAVLvalueHeight(getBSTNODEvalue(leftNode));
             }
-        else{AVLv->lheight = 0;}
+        else{
+            AVLv->lheight = 0;
+            }
         //set right height
         if(rightNode != 0){
             AVLv->rheight = getAVLvalueHeight(getBSTNODEvalue(rightNode));
@@ -384,10 +416,10 @@
     static BSTNODE *sibling(BSTNODE *checkNode){
         AVLvalue *AVLcheck = getBSTNODEvalue(checkNode);
         BSTNODE *checkP = getBSTNODEparent(checkNode);
-        if(getBSTNODEleft(getBSTNODEparent(checkNode)) == 0){
+        if(getBSTNODEleft(checkP) == 0){
             return 0;
             }
-        else if(getBSTNODEright(getBSTNODEparent(checkNode)) == 0){
+        else if(getBSTNODEright(checkP) == 0){
             return 0;
             }
         else if( compAVLvalue(getBSTNODEvalue(getBSTNODEleft(checkP)), AVLcheck) == 0){
@@ -488,8 +520,11 @@
         else{
             //is x to the left
             if(compAVLvalue(getBSTNODEvalue(getBSTNODEleft(p)), AVLx) == 0){
-                if(compAVLvalue(getBSTNODEvalue(getBSTNODEleft(x)),AVLy) == 0){
-                    return 1;
+                if(getBSTNODEleft(x) != 0){
+                    if(compAVLvalue(getBSTNODEvalue(getBSTNODEleft(x)),AVLy) == 0){
+                        return 1;
+                        }
+                    else{return 0;}
                     }
                 else{
                     return 0;
@@ -497,8 +532,11 @@
                 }
             //is x to the right
             if(compAVLvalue(getBSTNODEvalue(getBSTNODEleft(p)), AVLx) == 0){
-                if(compAVLvalue(getBSTNODEvalue(getBSTNODEright(x)),AVLy) == 0){
-                    return 1;
+                if(getBSTNODEright(x) != 0){
+                    if(compAVLvalue(getBSTNODEvalue(getBSTNODEright(x)),AVLy) == 0){
+                        return 1;
+                        }
+                    else{return 0;}
                     }
                 else{
                     return 0;
@@ -568,7 +606,6 @@
         else{
             //is root
             if(compAVLvalue(getBSTNODEvalue(temp), getBSTNODEvalue(Node1)) == 0){
-                printf("check");
                 setBSTNODEparent(Node1, Node2);
                 setBSTNODEparent(Node2, Node2);
                 setBSTroot(avl->bst, Node2);
