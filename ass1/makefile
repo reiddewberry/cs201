@@ -3,10 +3,13 @@ OBJSH = integer.h real.h sll.h dll.h stack.h queue.h
 OOPTS = -Wall -Wextra -g -c
 LOPTS = -Wall -Wextra -g
 
-all : test-bst test-heap heapsort
+all : test-bst bst-1-3 test-heap heapsort
 
 test-bst : test-bst.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
 	gcc $(LOPTS) test-bst.c bst.o queue.o sll.o integer.o -o test-bst
+
+bst-1-3 : bst-1-3.c bst.h queue.h sll.h integer.h bst.o queue.o sll.o integer.o
+	gcc $(LOPTS) bst-1-3.c bst.o queue.o sll.o integer.o -o bst-1-3
 
 test-heap : test-heap.c heap.h bst.h queue.h stack.h sll.h dll.h integer.h heap.o bst.o queue.o stack.o sll.o dll.o integer.o
 	gcc $(LOPTS) test-heap.c heap.o bst.o queue.o stack.o sll.o dll.o integer.o -o test-heap
@@ -66,7 +69,7 @@ test : test-heap
 	echo
 
 clean    :
-	rm -f $(OBJS) test-*.o *.o test-sll test-dll test-stack test-queue test-bst test-heap heapsort heap-0-0 heap-0-1 heap-0-2 bst-0-0
+	rm -f $(OBJS) test-*.o *.o test-sll test-dll test-stack test-queue test-bst test-heap heapsort heap-0-0 heap-0-1 heap-0-2 bst-0-0 bst-1-3
 
 # Using test server test files
 

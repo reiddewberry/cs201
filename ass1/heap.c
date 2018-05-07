@@ -1,25 +1,31 @@
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <assert.h>
-    #include "stack.h"
-    #include "queue.h"
-    #include "bst.h"
+/*
+Chandler Reid Dewberry
+Heap Program
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include "stack.h"
+#include "queue.h"
+#include "bst.h"
 
-
+//heap structure
     typedef struct heap{
-        int size;
-        BST *tree;
-        QUEUE *queue;
-        STACK *stack;
-        void (*display)(void *,FILE *);
-        int (*compare)(void *, void *);
-        void (*free)(void *);
+        int size;                       //int value of how many nodes are in the heap
+        BST *tree;                      //underlying BST structure
+        QUEUE *queue;                   //underlying QUEUE structure
+        STACK *stack;                   //underlying STACK structure
+        void (*display)(void *,FILE *); //display function passed in
+        int (*compare)(void *, void *); //compare function passed in
+        void (*free)(void *);           //free function passed in
         }HEAP;
 
+//Public function to create and initialize a new HEAP
     HEAP *newHEAP(
         void (*d)(void *,FILE *),    //display
         int (*c)(void *,void *),     //compare
         void (*f)(void *)){          //free
+        //malloc is used to allocate memory and assert to verify there is enough
         HEAP *heap = malloc(sizeof(HEAP));
         assert(heap != 0);
         heap->size = 0;
@@ -31,11 +37,19 @@
         heap->free = f;
         return heap;
         }
-
+/*
+Inserts a value into the HEAP
+2 Parameters:
+    heap - the HEAP that will be inserted into
+    value - whatever data the user  is inserting into the heap
+*/
     void insertHEAP(HEAP *heap,void *value){
+        //create the new Node and verify it exists
         BSTNODE *newNode = newBSTNODE(value);
         assert(newNode != 0);
+        //enqueue the new Node to the QUEUE
         enqueue(heap->queue,newNode);
+        //if the HEAP is empty, set the Node as the Root
         if(getBSTroot(heap->tree) == 0){
             setBSTroot(heap->tree,newNode);
             }
@@ -50,7 +64,9 @@
                 dequeue(heap->queue);
                 }
             }
+        //pushes the Node onto the STACK
         push(heap->stack,newNode);
+        //increases the HEAP size and the BST size
         heap->size += 1;
         setBSTsize(heap->tree,(sizeBST(heap->tree)+1));
         }
@@ -110,10 +126,18 @@
             }
         }
 
-    //creates the max or min heap by heapify. (bubble down)
+/*
+Creates the max or min heap by heapify. (bubble down)
+IMPORTANT: Extract Heap cannot be called after this
+1 Parameter:
+    heap - HEAP to be heapified
+*/
     void buildHEAP(HEAP *heap){
+        //free the QUEUE
         freeQUEUE(heap->queue);
+        //make a new QUEUE
         heap->queue = newQUEUE(0,0);
+        //Goes through each Node and bubbles them down.
         for(int i=0;i < heap->size; i++){
             BSTNODE *heapifyNode = pop(heap->stack);
             enqueue(heap->queue,heapifyNode);
@@ -126,8 +150,14 @@
         return getBSTNODEvalue(getBSTroot(heap->tree));
         }
 
-    //switches the farthest right leaf with the root
-    //and frees the value. Then bubbles the new root down
+/*
+Switches the farthest right leaf with the root
+and frees the value. Then bubbles the new root down
+1 Parameter:
+    heap - the HEAP that you are extracting from
+Returns:
+    The current Minimum or Maximum depending on the type of Heap
+*/
     void *extractHEAP(HEAP *heap){
         BSTNODE *newRoot = dequeue(heap->queue);
         BSTNODE *heapRoot = getBSTroot(heap->tree);
